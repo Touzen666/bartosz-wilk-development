@@ -1,0 +1,52 @@
+// Wilk Development — schemat na przyszłe przejście z content.ts na bazę.
+// Obecnie aplikacja korzysta z src/data/content.ts; po ustawieniu DATABASE_URL
+// i uruchomieniu migracji + seed możesz przełączyć na Prisma (patrz README / env).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Project {
+  id          String   @id
+  title       String
+  category    String   // "domy-szeregowe" | "remonty"
+  description String
+  imageUrl    String
+  status      String   // "W sprzedaży" | "Zakończone"
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model NewsItem {
+  id        String   @id
+  title     String
+  excerpt   String
+  body      String
+  date      String   // ISO date
+  imageUrl  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Service {
+  id    String @id
+  name  String
+  order Int    @default(0)
+}
+
+// Sekcje oferty (domy szeregowe, remonty pod klucz)
+model OfferSection {
+  id          String   @id
+  slug        String   @unique // np. "domy-szeregowe", "remonty-pod-klucz"
+  title       String
+  subtitle    String
+  description String
+  highlights  String   // JSON array of strings
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
