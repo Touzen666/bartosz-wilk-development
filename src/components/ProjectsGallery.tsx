@@ -1,42 +1,38 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { useRef, useState, useCallback } from "react";
-import { useSearchParams } from "next/navigation";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { Project } from "~/data/content";
 
-type Props = {
-  projects: Project[];
-  category?: string;
-  status?: string;
-};
+type CategoryFilter = "wszystkie" | "domy-szeregowe" | "remonty";
+type StatusFilter   = "wszystkie" | "W sprzedaży" | "Zakończone";
 
-const CATEGORY_FILTERS = [
-  { label: "Wszystkie typy", value: "wszystkie" },
-  { label: "Domy szeregowe", value: "domy-szeregowe" },
-  { label: "Remonty", value: "remonty" },
-] as const;
+type Props = { projects: Project[] };
 
-const STATUS_FILTERS = [
-  { label: "Wszystkie statusy", value: "wszystkie" },
-  { label: "W sprzedaży", value: "W sprzedaży" },
-  { label: "Zakończone", value: "Zakończone" },
-] as const;
+const CATEGORY_FILTERS: { label: string; value: CategoryFilter }[] = [
+  { label: "Wszystkie typy",  value: "wszystkie"      },
+  { label: "Domy szeregowe",  value: "domy-szeregowe" },
+  { label: "Remonty",         value: "remonty"        },
+];
 
-export function ProjectsGallery({ projects, category = "wszystkie", status = "wszystkie" }: Props) {
-  const searchParams = useSearchParams();
+const STATUS_FILTERS: { label: string; value: StatusFilter }[] = [
+  { label: "Wszystkie statusy", value: "wszystkie"  },
+  { label: "W sprzedaży",       value: "W sprzedaży" },
+  { label: "Zakończone",        value: "Zakończone"  },
+];
+
+export function ProjectsGallery({ projects }: Props) {
+  const [catFilter,    setCatFilter]    = useState<CategoryFilter>("wszystkie");
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("wszystkie");
+  const [activeIndex,  setActiveIndex]  = useState(0);
   const trackRef = useRef<HTMLUListElement>(null);
-  const [activeIndex, setActiveIndex] = useState(0);
 
-  function buildHref(key: "kategoria" | "status", value: string) {
-    const params = new URLSearchParams(searchParams.toString());
-    if (value === "wszystkie") params.delete(key);
-    else params.set(key, value);
-    const qs = params.toString();
-    return qs ? `/?${qs}` : "/";
-  }
+  const filtered = projects.filter((p) => {
+    if (catFilter    !== "wszystkie" && p.category !== catFilter)    return false;
+    if (statusFilter !== "wszystkie" && p.status   !== statusFilter) return false;
+    return true;
+  });
 
   const scrollTo = useCallback((index: number) => {
     const track = trackRef.current;
@@ -49,14 +45,14 @@ export function ProjectsGallery({ projects, category = "wszystkie", status = "ws
   }, []);
 
   const prev = () => scrollTo(Math.max(0, activeIndex - 1));
-  const next = () => scrollTo(Math.min(projects.length - 1, activeIndex + 1));
+  const next = () => scrollTo(Math.min(filtered.length - 1, activeIndex + 1));
 
   const handleScroll = useCallback(() => {
     const track = trackRef.current;
     if (!track) return;
     const items = track.querySelectorAll<HTMLLIElement>("li");
     let closest = 0;
-    let minDist = Infinity;
+    let minDist  = Infinity;
     items.forEach((item, i) => {
       const dist = Math.abs(item.offsetLeft - track.offsetLeft - track.scrollLeft);
       if (dist < minDist) { minDist = dist; closest = i; }
@@ -64,31 +60,43 @@ export function ProjectsGallery({ projects, category = "wszystkie", status = "ws
     setActiveIndex(closest);
   }, []);
 
+  function applyFilter(type: "cat" | "status", value: CategoryFilter | StatusFilter) {
+    if (type === "cat")    setCatFilter(value as CategoryFilter);
+    else                    setStatusFilter(value as StatusFilter);
+    setActiveIndex(0);
+    requestAnimationFrame(() => {
+      const track = trackRef.current;
+      if (track) track.scrollLeft = 0;
+    });
+  }
+
   return (
     <div>
       {/* Filters */}
       <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "0.5rem" }}>
         {CATEGORY_FILTERS.map((item) => (
-          <Link
+          <button
             key={item.value}
-            href={buildHref("kategoria", item.value)}
-            className={`wp-tag ${category === item.value ? "wp-tag-active" : ""}`}
+            type="button"
+            onClick={() => applyFilter("cat", item.value)}
+            className={`wp-tag ${catFilter === item.value ? "wp-tag-active" : ""}`}
           >
             {item.label}
-          </Link>
+          </button>
         ))}
         {STATUS_FILTERS.map((item) => (
-          <Link
+          <button
             key={item.value}
-            href={buildHref("status", item.value)}
-            className={`wp-tag ${status === item.value ? "wp-tag-active" : ""}`}
+            type="button"
+            onClick={() => applyFilter("status", item.value)}
+            className={`wp-tag ${statusFilter === item.value ? "wp-tag-active" : ""}`}
           >
             {item.label}
-          </Link>
+          </button>
         ))}
       </div>
 
-      {projects.length === 0 ? (
+      {filtered.length === 0 ? (
         <p style={{ textAlign: "center", marginTop: "3rem", color: "var(--slate)" }}>
           Brak realizacji dla wybranych filtrów.
         </p>
@@ -110,7 +118,7 @@ export function ProjectsGallery({ projects, category = "wszystkie", status = "ws
                 paddingBottom: "0.5rem",
               }}
             >
-              {projects.map((project, idx) => (
+              {filtered.map((project, idx) => (
                 <li
                   key={project.id}
                   style={{
@@ -118,10 +126,7 @@ export function ProjectsGallery({ projects, category = "wszystkie", status = "ws
                     scrollSnapAlign: "start",
                   }}
                 >
-                  <article
-                    className="wp-card"
-                    style={{ overflow: "hidden", height: "100%" }}
-                  >
+                  <article className="wp-card" style={{ overflow: "hidden", height: "100%" }}>
                     <div style={{ position: "relative", aspectRatio: "4/3", background: "var(--offwhite-warm)" }}>
                       <Image
                         src={project.image_url}
@@ -188,7 +193,7 @@ export function ProjectsGallery({ projects, category = "wszystkie", status = "ws
 
             <button
               onClick={next}
-              disabled={activeIndex === projects.length - 1}
+              disabled={activeIndex === filtered.length - 1}
               aria-label="Następny projekt"
               style={{
                 position: "absolute", top: "50%", right: "-1.25rem",
@@ -202,7 +207,7 @@ export function ProjectsGallery({ projects, category = "wszystkie", status = "ws
                 cursor: "pointer",
                 color: "var(--charcoal)",
                 transition: "background var(--transition), color var(--transition), opacity var(--transition)",
-                opacity: activeIndex === projects.length - 1 ? 0.35 : 1,
+                opacity: activeIndex === filtered.length - 1 ? 0.35 : 1,
                 zIndex: 10,
               }}
             >
@@ -214,11 +219,9 @@ export function ProjectsGallery({ projects, category = "wszystkie", status = "ws
           <div
             role="tablist"
             aria-label="Nawigacja slidera"
-            style={{
-              display: "flex", justifyContent: "center", gap: "0.5rem", marginTop: "1.5rem",
-            }}
+            style={{ display: "flex", justifyContent: "center", gap: "0.5rem", marginTop: "1.5rem" }}
           >
-            {projects.map((_, i) => (
+            {filtered.map((_, i) => (
               <button
                 key={i}
                 role="tab"

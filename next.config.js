@@ -4,6 +4,10 @@ const config = {
   poweredByHeader: false,
   compress: true,
 
+  experimental: {
+    optimizePackageImports: ["lucide-react"],
+  },
+
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "images.unsplash.com", pathname: "/**" },

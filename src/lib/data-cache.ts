@@ -1,6 +1,7 @@
 import "server-only";
 import { unstable_cache } from "next/cache";
-import type { NewsItem, Project } from "~/data/content";
+import { createCaller } from "~/server/api/trpc/server";
+import type { NewsItem } from "~/data/content";
 
 /**
  * Revalidation windows:
@@ -11,15 +12,10 @@ import type { NewsItem, Project } from "~/data/content";
 const TTL_STANDARD = 3600; // 1 hour
 const TTL_NEWS     = 600;  // 10 minutes
 
-async function getCaller() {
-  const { createCaller } = await import("~/server/api/trpc/server");
-  return createCaller();
-}
-
 // ─── Offer ───────────────────────────────────────────────────────────────────
 export const getCachedOffer = unstable_cache(
   async () => {
-    const caller = await getCaller();
+    const caller = await createCaller();
     return caller.content.getOffer();
   },
   ["offer"],
@@ -29,7 +25,7 @@ export const getCachedOffer = unstable_cache(
 // ─── Projects ────────────────────────────────────────────────────────────────
 export const getCachedProjects = unstable_cache(
   async (opts?: { status?: string; category?: string; limit?: number }) => {
-    const caller = await getCaller();
+    const caller = await createCaller();
     return caller.content.getProjects(
       opts as Parameters<typeof caller.content.getProjects>[0]
     );
@@ -41,7 +37,7 @@ export const getCachedProjects = unstable_cache(
 // ─── News ─────────────────────────────────────────────────────────────────────
 export const getCachedNews = unstable_cache(
   async (limit?: number) => {
-    const caller = await getCaller();
+    const caller = await createCaller();
     return caller.content.getNews(limit ? { limit } : undefined) as Promise<NewsItem[]>;
   },
   ["news"],
@@ -50,7 +46,7 @@ export const getCachedNews = unstable_cache(
 
 export const getCachedNewsItem = unstable_cache(
   async (id: string) => {
-    const caller = await getCaller();
+    const caller = await createCaller();
     return caller.content.getNewsItem({ id });
   },
   ["news-item"],
@@ -60,7 +56,7 @@ export const getCachedNewsItem = unstable_cache(
 // ─── Services ────────────────────────────────────────────────────────────────
 export const getCachedUslugi = unstable_cache(
   async () => {
-    const caller = await getCaller();
+    const caller = await createCaller();
     return caller.content.getUslugi();
   },
   ["uslugi"],

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
-import { Suspense } from "react";
 import {
   Building2,
   Paintbrush,
@@ -51,7 +50,7 @@ export const metadata: Metadata = {
 export default async function HomePage() {
   const [offer, projects, uslugi] = await Promise.all([
     getCachedOffer(),
-    getCachedProjects({ limit: 9 }),
+    getCachedProjects(),
     getCachedUslugi(),
   ]);
 
@@ -533,15 +532,7 @@ export default async function HomePage() {
             </p>
           </div>
 
-          <Suspense
-            fallback={
-              <div style={{ textAlign: "center", padding: "4rem 0", color: "var(--slate)" }}>
-                Ładowanie realizacji…
-              </div>
-            }
-          >
-            <ProjectsGallery projects={projects} />
-          </Suspense>
+          <ProjectsGallery projects={projects} />
         </div>
       </section>
 

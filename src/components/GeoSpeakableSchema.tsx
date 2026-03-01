@@ -16,7 +16,6 @@ export function GeoSpeakableSchema() {
       "@type": "SpeakableSpecification",
       cssSelector: [
         "#geo-about",
-        "#geo-stats",
         "#geo-offer-domy",
         "#geo-offer-remonty",
         "#geo-faq",
