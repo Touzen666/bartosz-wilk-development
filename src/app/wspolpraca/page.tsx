@@ -3,6 +3,8 @@ import Link from "next/link";
 import { canonical } from "~/lib/seo";
 import { Breadcrumbs } from "~/components/Breadcrumbs";
 
+export const revalidate = 86400; // statyczna – regeneruj raz na dobę
+
 export const metadata: Metadata = {
   title: "Współpraca",
   description:

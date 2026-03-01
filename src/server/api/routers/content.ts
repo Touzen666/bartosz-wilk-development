@@ -1,40 +1,30 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { OFFER, PROJECTS, NEWS, USLUGI } from "~/data/content";
+import { ProjectSchema, NewsItemSchema } from "~/generated/zod";
 
-const statusEnum = z.enum(["W sprzedaży", "Zakończone"]);
+const statusEnum   = z.enum(["W sprzedaży", "Zakończone"]);
 const categoryEnum = z.enum(["domy-szeregowe", "remonty"]);
 
 export const contentRouter = createTRPCRouter({
+
   getOffer: publicProcedure.query(async ({ ctx }) => {
     if (ctx.db) {
-      const sections = await ctx.db.offerSection.findMany({
-        orderBy: { slug: "asc" },
-      });
+      const sections = await ctx.db.offerSection.findMany({ orderBy: { slug: "asc" } });
       const bySlug = Object.fromEntries(
         sections.map((s) => [
           s.slug === "domy-szeregowe" ? "domySzeregowe" : "remontyPodKlucz",
           {
-            title: s.title,
-            subtitle: s.subtitle,
+            title:       s.title,
+            subtitle:    s.subtitle,
             description: s.description,
-            highlights: JSON.parse(s.highlights) as string[],
+            highlights:  JSON.parse(s.highlights) as string[],
           },
         ])
       );
       return {
-        domySzeregowe: bySlug.domySzeregowe ?? {
-          title: "",
-          subtitle: "",
-          description: "",
-          highlights: [],
-        },
-        remontyPodKlucz: bySlug.remontyPodKlucz ?? {
-          title: "",
-          subtitle: "",
-          description: "",
-          highlights: [],
-        },
+        domySzeregowe:  bySlug.domySzeregowe  ?? { title: "", subtitle: "", description: "", highlights: [] },
+        remontyPodKlucz: bySlug.remontyPodKlucz ?? { title: "", subtitle: "", description: "", highlights: [] },
       };
     }
     return OFFER;
@@ -42,65 +32,55 @@ export const contentRouter = createTRPCRouter({
 
   getProjects: publicProcedure
     .input(
-      z
-        .object({
-          status: statusEnum.optional(),
-          category: categoryEnum.optional(),
-          limit: z.number().min(1).max(20).optional(),
-        })
-        .optional()
+      z.object({
+        status:   statusEnum.optional(),
+        category: categoryEnum.optional(),
+        limit:    z.number().min(1).max(50).optional(),
+      }).optional()
     )
     .query(async ({ ctx, input }) => {
       if (ctx.db) {
         const where: { status?: string; category?: string } = {};
-        if (input?.status) where.status = input.status;
+        if (input?.status)   where.status   = input.status;
         if (input?.category) where.category = input.category;
         const list = await ctx.db.project.findMany({
-          where: Object.keys(where).length ? where : undefined,
-          orderBy: { createdAt: "desc" },
-          take: input?.limit ?? 50,
+          where:    Object.keys(where).length ? where : undefined,
+          orderBy:  { createdAt: "desc" },
+          take:     input?.limit ?? 50,
         });
         return list.map((p) => ({
-          id: p.id,
-          title: p.title,
-          category: p.category as "domy-szeregowe" | "remonty",
+          id:          p.id,
+          title:       p.title,
+          category:    p.category as "domy-szeregowe" | "remonty",
           description: p.description,
-          image_url: p.imageUrl,
-          status: p.status as "W sprzedaży" | "Zakończone",
+          image_url:   p.imageUrl,
+          status:      p.status as "W sprzedaży" | "Zakończone",
         }));
       }
       let list = [...PROJECTS];
-      if (input?.status) list = list.filter((p) => p.status === input.status);
+      if (input?.status)   list = list.filter((p) => p.status   === input.status);
       if (input?.category) list = list.filter((p) => p.category === input.category);
-      const limit = input?.limit ?? list.length;
-      return list.slice(0, limit);
+      return list.slice(0, input?.limit ?? list.length);
     }),
 
   getNews: publicProcedure
-    .input(
-      z
-        .object({
-          limit: z.number().min(1).max(50).optional(),
-        })
-        .optional()
-    )
+    .input(z.object({ limit: z.number().min(1).max(50).optional() }).optional())
     .query(async ({ ctx, input }) => {
       if (ctx.db) {
         const list = await ctx.db.newsItem.findMany({
           orderBy: { date: "desc" },
-          take: input?.limit ?? 50,
+          take:    input?.limit ?? 50,
         });
         return list.map((n) => ({
-          id: n.id,
-          title: n.title,
-          excerpt: n.excerpt,
-          body: n.body,
-          date: n.date,
+          id:       n.id,
+          title:    n.title,
+          excerpt:  n.excerpt,
+          body:     n.body,
+          date:     n.date,
           image_url: n.imageUrl,
         }));
       }
-      const limit = input?.limit ?? NEWS.length;
-      return NEWS.slice(0, limit);
+      return NEWS.slice(0, input?.limit ?? NEWS.length);
     }),
 
   getNewsItem: publicProcedure
@@ -110,11 +90,11 @@ export const contentRouter = createTRPCRouter({
         const n = await ctx.db.newsItem.findUnique({ where: { id: input.id } });
         if (!n) return null;
         return {
-          id: n.id,
-          title: n.title,
-          excerpt: n.excerpt,
-          body: n.body,
-          date: n.date,
+          id:       n.id,
+          title:    n.title,
+          excerpt:  n.excerpt,
+          body:     n.body,
+          date:     n.date,
           image_url: n.imageUrl,
         };
       }

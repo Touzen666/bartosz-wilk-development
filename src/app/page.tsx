@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
+import { Suspense } from "react";
 import {
   Building2,
   Paintbrush,
@@ -16,9 +17,8 @@ import {
   CheckCircle2,
   ArrowRight,
 } from "lucide-react";
-import { createCaller } from "~/server/api/trpc/server";
 import { canonical } from "~/lib/seo";
-import type { Project } from "~/data/content";
+import { getCachedOffer, getCachedProjects, getCachedUslugi } from "~/lib/data-cache";
 import {
   ABOUT_INTRO,
   WHY_US,
@@ -28,8 +28,12 @@ import {
   OFFER_PSR,
   FAQ_ITEMS,
 } from "~/data/content";
+import { TrendingUp, Users, Calendar, Award } from "lucide-react";
 import { GeoFaq } from "~/components/GeoFaq";
 import { GeoSpeakableSchema } from "~/components/GeoSpeakableSchema";
+import { ProjectsGallery } from "~/components/ProjectsGallery";
+
+export const revalidate = 3600; // ISR: regeneruj co 1 h
 
 export const metadata: Metadata = {
   title: "Wilk Development — Domy szeregowe i remonty pod klucz",
@@ -44,33 +48,11 @@ export const metadata: Metadata = {
   },
 };
 
-type HomePageSearchParams = {
-  kategoria?: "domy-szeregowe" | "remonty" | "wszystkie";
-  status?: "W sprzedaży" | "Zakończone" | "wszystkie";
-};
-
-export default async function HomePage({
-  searchParams,
-}: {
-  searchParams?: HomePageSearchParams;
-}) {
-  const categoryParam = searchParams?.kategoria;
-  const statusParam = searchParams?.status;
-
-  const categoryFilter =
-    categoryParam && categoryParam !== "wszystkie" ? categoryParam : undefined;
-  const statusFilter =
-    statusParam && statusParam !== "wszystkie" ? statusParam : undefined;
-
-  const caller = await createCaller();
+export default async function HomePage() {
   const [offer, projects, uslugi] = await Promise.all([
-    caller.content.getOffer(),
-    caller.content.getProjects({
-      limit: 9,
-      ...(categoryFilter && { category: categoryFilter }),
-      ...(statusFilter && { status: statusFilter }),
-    }),
-    caller.content.getUslugi(),
+    getCachedOffer(),
+    getCachedProjects({ limit: 9 }),
+    getCachedUslugi(),
   ]);
 
   return (
@@ -109,7 +91,7 @@ export default async function HomePage({
           style={{ paddingBlock: "clamp(5rem, 10vw, 8rem)", zIndex: 3 }}
         >
           <div style={{ maxWidth: "44rem" }}>
-            <span className="section-label">
+            <span className="section-label-dash" style={{ color: "var(--gold)" }}>
               Rzeszów · Podkarpacie · od 2010 roku
             </span>
             <h1
@@ -152,94 +134,72 @@ export default async function HomePage({
       </section>
 
       {/* ═══════════════════════════════════════
-          STATS BAR
+          ABOUT – split stats panel
       ═══════════════════════════════════════ */}
-      <section
-        id="geo-stats"
-        className="geo-speakable section-white"
-        aria-labelledby="stats-label"
-        style={{ paddingBlock: "clamp(2.5rem, 4vw, 3.5rem)", borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}
-      >
-        <div className="wp-section mx-auto max-w-content">
-          <h2 id="stats-label" className="sr-only">Fakty i liczby</h2>
-          <ul
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              justifyContent: "center",
-              gap: "0",
-              listStyle: "none",
-            }}
-          >
-            {[
-              { value: `${GEO_STATS.yearsOnMarket}+`, label: "lat\nna rynku" },
-              { value: `${GEO_STATS.bathroomRenovationDays}`, label: "dni\nremont łazienki" },
-              { value: `${GEO_STATS.terraceBuildWeeks} tyg.`, label: "budowa\ntarasu" },
-              { value: GEO_STATS.completedProjects, label: "zrealizowanych\ninwestycji" },
-            ].map(({ value, label }, i) => (
-              <li
-                key={i}
-                className="stat-block"
-                style={{
-                  borderRight: i < 3 ? "1px solid var(--border)" : undefined,
-                  padding: "0.5rem clamp(1.5rem, 3vw, 3rem)",
-                  minWidth: "130px",
-                }}
-              >
-                <span className="stat-number" style={{ color: "var(--navy)" }}>{value}</span>
-                <span className="stat-label" style={{ whiteSpace: "pre-line" }}>
-                  {label}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════
-          ABOUT – light warm bg
-      ═══════════════════════════════════════ */}
-      <section
-        id="geo-about"
-        className="geo-speakable section-warm"
-        aria-labelledby="about-heading"
-        style={{ paddingBlock: "var(--section-py)" }}
-      >
-        <div className="wp-section mx-auto max-w-content">
-          <div className="grid gap-12 items-center md:grid-cols-2">
+      <section id="geo-about" className="geo-speakable" aria-labelledby="about-heading">
+        <div
+          className="stats-split wp-section mx-auto max-w-content md:grid-cols-[2fr_3fr]"
+          style={{ boxShadow: "var(--shadow-xl)" }}
+        >
+          {/* Left: gold panel */}
+          <div className="stats-split-left">
+            <span className="section-label-dash" style={{ color: "var(--navy)" }}>O firmie</span>
+            <h2
+              id="about-heading"
+              style={{
+                color: "var(--navy)",
+                fontSize: "clamp(1.5rem, 3vw, 2.25rem)",
+                lineHeight: 1.2,
+              }}
+            >
+              {GEO_STATS.yearsOnMarket}+ lat<br />nieprzerwanego sukcesu
+            </h2>
+            <p style={{ fontSize: "0.9375rem", color: "rgba(10,18,30,0.75)", lineHeight: 1.7 }}>
+              {ABOUT_INTRO}
+            </p>
             <div>
-              <span className="section-label">O firmie</span>
-              <h2 id="about-heading" className="heading-accent" style={{ marginTop: "0.5rem" }}>
-                Czym się zajmujemy
-              </h2>
-              <p style={{ marginTop: "1.75rem", color: "var(--charcoal-soft)", lineHeight: 1.78 }}>
-                {ABOUT_INTRO}
-              </p>
               <Link
-                href="/uslugi"
-                className="wp-btn-primary"
-                style={{ marginTop: "2rem", display: "inline-flex" }}
+                href="/wspolpraca"
+                style={{
+                  display: "inline-flex", alignItems: "center", gap: "0.5rem",
+                  background: "var(--navy)", color: "var(--white)",
+                  fontFamily: "var(--font-heading, 'Montserrat', sans-serif)",
+                  fontWeight: 700, fontSize: "0.875rem",
+                  padding: "0.75rem 1.5rem",
+                  letterSpacing: "0.02em",
+                  transition: "opacity var(--transition)",
+                }}
+                className="hover:opacity-80"
               >
-                Nasze usługi <ArrowRight size={15} aria-hidden />
+                Pracuj z nami <ArrowRight size={14} aria-hidden />
               </Link>
             </div>
-            <ul style={{ display: "flex", flexDirection: "column", gap: "1rem", listStyle: "none" }}>
-              {WHY_US.slice(0, 4).map((item) => (
-                <li key={item.title} style={{ display: "flex", alignItems: "flex-start", gap: "0.75rem" }}>
-                  <CheckCircle2 size={18} style={{ color: "var(--gold)", flexShrink: 0, marginTop: "0.15rem" }} aria-hidden />
-                  <span style={{ fontSize: "0.9375rem", color: "var(--charcoal-soft)" }}>
-                    <strong style={{ color: "var(--charcoal)", fontFamily: "var(--font-heading, 'Montserrat', sans-serif)" }}>{item.title} — </strong>
-                    {item.description}
-                  </span>
-                </li>
-              ))}
-            </ul>
+          </div>
+
+          {/* Right: 2x2 stats grid */}
+          <div className="stats-split-right">
+            {[
+              { icon: TrendingUp, value: `${GEO_STATS.completedProjects}+`, label: "Zrealizowanych projektów" },
+              { icon: Calendar,   value: `${GEO_STATS.yearsOnMarket}+`,     label: "Lat na rynku budowlanym" },
+              { icon: Users,      value: "1 kontakt",                        label: "Jedna firma, pełna obsługa" },
+              { icon: Award,      value: "100%",                             label: "Certyfikowane materiały" },
+            ].map(({ icon: Icon, value, label }) => (
+              <div key={label} className="stat-item">
+                <span className="stat-icon">
+                  <Icon size={18} aria-hidden />
+                </span>
+                <div>
+                  <span className="stat-value">{value}</span>
+                  <span className="stat-desc">{label}</span>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* ═══════════════════════════════════════
-          DLACZEGO MY – white bg
+          JAKOŚĆ USŁUG – photo cards (Quality Services)
       ═══════════════════════════════════════ */}
       <section
         className="section-white"
@@ -248,43 +208,59 @@ export default async function HomePage({
       >
         <div className="wp-section mx-auto max-w-content">
           <div style={{ textAlign: "center", maxWidth: "40rem", margin: "0 auto" }}>
-            <span className="section-label">Dlaczego my?</span>
+            <span className="section-label-dash" style={{ justifyContent: "center" }}>Nasze usługi</span>
             <h2 id="why-heading" style={{ marginTop: "0.5rem" }}>
-              Twoja budowa, nasza odpowiedzialność
+              Jakość usług budowlanych
             </h2>
           </div>
           <ul
             style={{
               marginTop: "3rem",
               display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 14rem), 1fr))",
-              gap: "1.25rem",
+              gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 19rem), 1fr))",
+              gap: "1.5rem",
               listStyle: "none",
             }}
           >
-            {WHY_US.map((item, i) => {
-              const icons = [Clock, Phone, Lightbulb, Ruler, ShieldCheck, Star, Layers, Briefcase];
-              const Icon = icons[i] ?? Star;
-              return (
-                <li key={item.title}>
-                  <div className="wp-content-box" style={{ height: "100%" }}>
-                    <span className="icon-badge">
-                      <Icon size={20} aria-hidden />
-                    </span>
-                    <p style={{
-                      marginTop: "1rem",
-                      fontFamily: "var(--font-heading, 'Montserrat', sans-serif)",
-                      fontWeight: 700, fontSize: "0.9375rem", color: "var(--charcoal)"
-                    }}>
-                      {item.title}
-                    </p>
-                    <p style={{ marginTop: "0.4rem", fontSize: "0.875rem", color: "var(--slate)", lineHeight: 1.6 }}>
-                      {item.description}
-                    </p>
+            {[
+              { icon: Building2,   title: "Budowa domów",        desc: "Domy szeregowe i jednorodzinne od fundamentów po klucze.",        img: "https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=600&q=80&auto=format&fit=crop" },
+              { icon: Paintbrush,  title: "Wykończenia wnętrz",  desc: "Kompleksowe wykończenia i aranżacje wnętrz pod klucz.",            img: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&q=80&auto=format&fit=crop" },
+              { icon: Ruler,       title: "Budowa tarasów",      desc: "Tarasy i werandy z trwałych materiałów — projekt i wykonanie.",    img: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80&auto=format&fit=crop" },
+              { icon: Lightbulb,   title: "Instalacje",          desc: "Elektryka, hydraulika i ogrzewanie — certyfikowani specjaliści.",  img: "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=600&q=80&auto=format&fit=crop" },
+              { icon: ShieldCheck, title: "Remonty mieszkań",    desc: "Pełny remont mieszkań i lokali użytkowych w Rzeszowie.",           img: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=600&q=80&auto=format&fit=crop" },
+              { icon: Layers,      title: "Układanie płytek",    desc: "Greś, gres porcelanowy, mozaika — łazienki, kuchnie, tarasy.",     img: "https://images.unsplash.com/photo-1581858726788-75bc0f6a952d?w=600&q=80&auto=format&fit=crop" },
+            ].map(({ icon: Icon, title, desc, img }) => (
+              <li key={title}>
+                <div className="spc">
+                  <div className="spc-photo">
+                    <Image
+                      src={img}
+                      alt={title}
+                      fill
+                      loading="lazy"
+                      className="object-cover"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    />
                   </div>
-                </li>
-              );
-            })}
+                  <div className="spc-body">
+                    <span className="spc-icon">
+                      <Icon size={18} aria-hidden />
+                    </span>
+                    <div>
+                      <p style={{
+                        fontFamily: "var(--font-heading, 'Montserrat', sans-serif)",
+                        fontWeight: 700, fontSize: "0.9375rem", color: "var(--charcoal)",
+                      }}>
+                        {title}
+                      </p>
+                      <p style={{ marginTop: "0.3rem", fontSize: "0.8125rem", color: "var(--slate)", lineHeight: 1.6 }}>
+                        {desc}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </li>
+            ))}
           </ul>
         </div>
       </section>
@@ -301,7 +277,7 @@ export default async function HomePage({
           <div style={{ textAlign: "center", maxWidth: "40rem", margin: "0 auto" }}>
             <span className="section-label">Nasza oferta</span>
             <h2 id="offer-heading" style={{ marginTop: "0.5rem" }}>
-              Co robimy najlepiej?
+              Co robimy <span style={{ color: "var(--gold)" }}>najlepiej?</span>
             </h2>
           </div>
           <div style={{ marginTop: "3rem", display: "grid", gap: "1.75rem" }}
@@ -397,6 +373,100 @@ export default async function HomePage({
       </section>
 
       {/* ═══════════════════════════════════════
+          SPLIT – dark left + yellow right
+      ═══════════════════════════════════════ */}
+      <section
+        aria-labelledby="process-heading"
+        className="split-dg md:grid-cols-2"
+      >
+        {/* Left: dark panel with bg image */}
+        <div className="split-dg-dark">
+          <Image
+            src="https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=900&q=75&auto=format&fit=crop"
+            alt=""
+            fill
+            loading="lazy"
+            className="object-cover"
+            sizes="50vw"
+            aria-hidden
+            style={{ zIndex: 0, opacity: 0.25 }}
+          />
+          <div style={{ position: "relative", zIndex: 1 }}>
+            <span className="section-label-dash">Zrównoważony rozwój</span>
+            <h2
+              id="process-heading"
+              style={{
+                marginTop: "0.75rem",
+                color: "var(--white)",
+                fontSize: "clamp(1.6rem, 3vw, 2.25rem)",
+              }}
+            >
+              Zaangażowani w bezpieczne i solidne budownictwo
+            </h2>
+            <p style={{ fontSize: "0.9375rem", color: "rgba(255,255,255,0.65)", lineHeight: 1.75 }}>
+              Każda budowa i remont realizowane są z dbałością o jakość, bezpieczeństwo i terminy. Wilk Development to gwarancja spokoju inwestora.
+            </p>
+            <Link
+              href="/wspolpraca"
+              style={{
+                display: "inline-flex", alignItems: "center", gap: "0.5rem",
+                background: "var(--gold)", color: "var(--navy)",
+                fontFamily: "var(--font-heading, 'Montserrat', sans-serif)",
+                fontWeight: 700, fontSize: "0.875rem",
+                padding: "0.75rem 1.5rem",
+                letterSpacing: "0.02em",
+                transition: "opacity var(--transition)",
+                marginTop: "0.5rem",
+              }}
+              className="hover:opacity-85"
+            >
+              Pracuj z nami <ArrowRight size={14} aria-hidden />
+            </Link>
+          </div>
+        </div>
+
+        {/* Right: yellow panel */}
+        <div className="split-dg-yellow">
+          <h2
+            style={{
+              color: "var(--navy)",
+              fontSize: "clamp(1.5rem, 2.5vw, 2rem)",
+              lineHeight: 1.25,
+            }}
+          >
+            Jesteśmy najlepsi w branży
+          </h2>
+          <p style={{ fontSize: "0.9375rem", color: "rgba(10,18,30,0.72)", lineHeight: 1.72 }}>
+            Ponad {GEO_STATS.yearsOnMarket} lat doświadczenia w budownictwie i wykończeniach na terenie Rzeszowa i Podkarpacia. Jedna firma — pełna odpowiedzialność za projekt.
+          </p>
+          <ul style={{ display: "flex", flexDirection: "column", gap: "1rem", listStyle: "none" }}>
+            {[
+              { icon: ShieldCheck, text: "Certyfikowane materiały budowlane" },
+              { icon: Clock,       text: "Realizacja na czas — gwarancja w umowie" },
+              { icon: Briefcase,   text: "Nowoczesne technologie i projekty" },
+              { icon: Star,        text: "Najnowszy design i wykończenia premium" },
+            ].map(({ icon: Icon, text }) => (
+              <li key={text} style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+                <span style={{
+                  display: "inline-flex", alignItems: "center", justifyContent: "center",
+                  width: "1.75rem", height: "1.75rem", borderRadius: "var(--radius-full)",
+                  background: "var(--navy)", color: "var(--gold)", flexShrink: 0,
+                }}>
+                  <Icon size={13} aria-hidden />
+                </span>
+                <span style={{
+                  fontSize: "0.9375rem", fontWeight: 600, color: "var(--navy)",
+                  fontFamily: "var(--font-heading, 'Montserrat', sans-serif)",
+                }}>
+                  {text}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════
           USŁUGI – warm bg
       ═══════════════════════════════════════ */}
       <section
@@ -407,7 +477,7 @@ export default async function HomePage({
         <div className="wp-section mx-auto max-w-content" style={{ textAlign: "center" }}>
           <span className="section-label">Co oferujemy</span>
           <h2 id="uslugi-heading" style={{ marginTop: "0.5rem" }}>
-            Pełna lista usług budowlanych
+            Pełna lista <span style={{ color: "var(--gold)" }}>usług budowlanych</span>
           </h2>
           <p style={{ marginTop: "0.875rem", color: "var(--slate)", maxWidth: "36rem", margin: "0.875rem auto 0" }}>
             Budowa tarasów i werand, remonty, malowanie, układanie płytek, wykończanie wnętrz i wiele więcej — na terenie Rzeszowa i Podkarpacia.
@@ -438,7 +508,7 @@ export default async function HomePage({
         <div className="wp-section mx-auto" style={{ maxWidth: "54rem" }}>
           <div style={{ textAlign: "center", marginBottom: "2.5rem" }}>
             <span className="section-label">FAQ</span>
-            <h2 style={{ marginTop: "0.5rem" }}>Masz pytania?</h2>
+            <h2 style={{ marginTop: "0.5rem" }}>Masz <span style={{ color: "var(--gold)" }}>pytania?</span></h2>
           </div>
           <GeoFaq items={FAQ_ITEMS} />
         </div>
@@ -456,173 +526,183 @@ export default async function HomePage({
           <div style={{ textAlign: "center", maxWidth: "40rem", margin: "0 auto" }}>
             <span className="section-label">Realizacje</span>
             <h2 id="projects-heading" style={{ marginTop: "0.5rem" }}>
-              Galeria naszych inwestycji
+              Galeria naszych <span style={{ color: "var(--gold)" }}>inwestycji</span>
             </h2>
             <p style={{ marginTop: "0.875rem", color: "var(--slate)" }}>
               Domy szeregowe oraz remonty pod klucz — wybrane projekty Wilk Development.
             </p>
           </div>
 
-          {/* Filters */}
-          <div style={{ marginTop: "2rem", display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "0.5rem" }}>
-            {[
-              { label: "Wszystkie typy", value: "wszystkie" as const },
-              { label: "Domy szeregowe", value: "domy-szeregowe" as const },
-              { label: "Remonty", value: "remonty" as const },
-            ].map((item) => {
-              const isActive = (searchParams?.kategoria ?? "wszystkie") === item.value;
-              const params = new URLSearchParams();
-              if (item.value !== "wszystkie") params.set("kategoria", item.value);
-              if (searchParams?.status && searchParams.status !== "wszystkie")
-                params.set("status", searchParams.status);
-              const href = params.toString() ? `/?${params.toString()}` : "/";
-              return (
-                <Link key={item.value} href={href} className={`wp-tag ${isActive ? "wp-tag-active" : ""}`}>
-                  {item.label}
-                </Link>
-              );
-            })}
-            {[
-              { label: "Wszystkie statusy", value: "wszystkie" as const },
-              { label: "W sprzedaży", value: "W sprzedaży" as const },
-              { label: "Zakończone", value: "Zakończone" as const },
-            ].map((item) => {
-              const isActive = (searchParams?.status ?? "wszystkie") === item.value;
-              const params = new URLSearchParams();
-              if (searchParams?.kategoria && searchParams.kategoria !== "wszystkie")
-                params.set("kategoria", searchParams.kategoria);
-              if (item.value !== "wszystkie") params.set("status", item.value);
-              const href = params.toString() ? `/?${params.toString()}` : "/";
-              return (
-                <Link key={item.value} href={href} className={`wp-tag ${isActive ? "wp-tag-active" : ""}`}>
-                  {item.label}
-                </Link>
-              );
-            })}
-          </div>
-
-          {/* Grid */}
-          <ul
-            style={{
-              marginTop: "2.5rem",
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 22rem), 1fr))",
-              gap: "1.5rem",
-              listStyle: "none",
-            }}
+          <Suspense
+            fallback={
+              <div style={{ textAlign: "center", padding: "4rem 0", color: "var(--slate)" }}>
+                Ładowanie realizacji…
+              </div>
+            }
           >
-            {projects.map((project: Project) => (
-              <li key={project.id}>
-                <article className="wp-card" style={{ overflow: "hidden" }}>
-                  <div style={{ position: "relative", aspectRatio: "4/3", background: "var(--offwhite-warm)" }}>
-                    <Image
-                      src={project.image_url}
-                      alt={project.title}
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    />
-                    <span
-                      style={{
-                        position: "absolute", top: "0.625rem", right: "0.625rem",
-                        background: "rgba(10,18,30,0.85)", color: "var(--white)",
-                        fontSize: "0.6875rem", fontWeight: 700, letterSpacing: "0.06em",
-                        padding: "0.25rem 0.625rem", borderRadius: "var(--radius-full)",
-                      }}
-                    >
-                      {project.status}
-                    </span>
-                  </div>
-                  <div style={{ padding: "1.25rem 1.5rem" }}>
-                    <p style={{
-                      fontFamily: "var(--font-heading, 'Montserrat', sans-serif)",
-                      fontWeight: 700, fontSize: "1rem", color: "var(--charcoal)"
-                    }}>
-                      {project.title}
-                    </p>
-                    <p style={{ marginTop: "0.4rem", fontSize: "0.875rem", color: "var(--slate)", lineHeight: 1.55,
-                                overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}>
-                      {project.description}
-                    </p>
-                  </div>
-                </article>
-              </li>
-            ))}
-          </ul>
+            <ProjectsGallery projects={projects} />
+          </Suspense>
         </div>
       </section>
 
       {/* ═══════════════════════════════════════
-          CTA / KONTAKT – bg image + overlay
+          KONTAKT – dark bg + karty + CTA
       ═══════════════════════════════════════ */}
       <section
-        className="relative overflow-hidden"
+        className="section-dark"
         aria-labelledby="contact-heading"
-        style={{ paddingBlock: "clamp(4rem, 8vw, 6rem)" }}
+        style={{ paddingBlock: "var(--section-py)" }}
       >
-        {/* Background image */}
-        <Image
-          src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1600&q=80&auto=format&fit=crop"
-          alt=""
-          fill
-          className="object-cover"
-          sizes="100vw"
-          aria-hidden
-          style={{ zIndex: 0 }}
-        />
-        {/* Dark overlay */}
-        <div
-          style={{
-            position: "absolute", inset: 0, zIndex: 1,
-            background: "rgba(10, 18, 30, 0.75)",
-          }}
-        />
+        <div className="wp-section mx-auto max-w-content">
 
-        <div className="wp-section relative mx-auto max-w-content" style={{ textAlign: "center", zIndex: 2 }}>
-          <span className="section-label">Kontakt</span>
-          <h2
-            id="contact-heading"
+          {/* Header */}
+          <div style={{ textAlign: "center", marginBottom: "3rem" }}>
+            <span className="section-label-dash" style={{ justifyContent: "center", color: "var(--gold)" }}>
+              Skontaktuj się z nami
+            </span>
+            <h2
+              id="contact-heading"
+              style={{
+                marginTop: "0.5rem",
+                color: "var(--white)",
+                fontSize: "clamp(1.6rem, 3.5vw, 2.5rem)",
+              }}
+            >
+              Bezpłatna wycena w 24&nbsp;h
+            </h2>
+            <p style={{ marginTop: "1rem", color: "rgba(255,255,255,0.6)", maxWidth: "38rem", margin: "1rem auto 0", lineHeight: 1.7 }}>
+              Zadzwoń, napisz lub wypełnij formularz. Odpowiadamy każdego dnia roboczego — bez zbędnego czekania.
+            </p>
+          </div>
+
+          {/* Karty kontaktowe */}
+          <div
             style={{
-              marginTop: "0.5rem",
-              fontFamily: "var(--font-heading, 'Montserrat', sans-serif)",
-              color: "var(--white)",
-              fontSize: "clamp(1.6rem, 3.5vw, 2.5rem)",
+              display: "grid",
+              gap: "1.5rem",
+              gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 18rem), 1fr))",
             }}
           >
-            Porozmawiajmy o Twojej inwestycji
-          </h2>
-          <p style={{ marginTop: "1rem", color: "rgba(255,255,255,0.7)", maxWidth: "36rem", margin: "1rem auto 0", lineHeight: 1.7 }}>
-            Zadzwoń lub napisz — wycena bezpłatna, odpowiadamy szybko. Rzeszów i cała Polska.
-          </p>
-          <div style={{ marginTop: "2.5rem", display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "1.5rem" }}>
+            {/* Telefon */}
             <a
               href={`tel:${CONTACT_SNIPPET.phone.replace(/\s/g, "")}`}
               style={{
-                display: "inline-flex", alignItems: "center", gap: "0.625rem",
-                fontSize: "1.0625rem", fontWeight: 700, color: "var(--gold)",
-                transition: "opacity var(--transition)",
+                display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center",
+                padding: "2.5rem 2rem",
+                background: "rgba(255,255,255,0.04)",
+                border: "1px solid rgba(255,255,255,0.1)",
+                transition: "border-color var(--transition), background var(--transition)",
+                textDecoration: "none",
+                gap: "1rem",
               }}
-              className="hover:opacity-80"
+              className="group hover:border-gold hover:bg-gold/10"
             >
-              <Phone size={18} aria-hidden /> {CONTACT_SNIPPET.phone}
+              <span style={{
+                display: "inline-flex", alignItems: "center", justifyContent: "center",
+                width: "3.5rem", height: "3.5rem", borderRadius: "var(--radius-full)",
+                background: "var(--gold)", color: "var(--navy)",
+              }}>
+                <Phone size={20} aria-hidden />
+              </span>
+              <div>
+                <p style={{ fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(255,255,255,0.45)", marginBottom: "0.4rem" }}>
+                  Zadzwoń teraz
+                </p>
+                <p style={{
+                  fontFamily: "var(--font-heading, 'Montserrat', sans-serif)",
+                  fontWeight: 800, fontSize: "clamp(1.1rem, 2vw, 1.35rem)",
+                  color: "var(--white)", letterSpacing: "-0.01em",
+                }}>
+                  {CONTACT_SNIPPET.phone}
+                </p>
+                <p style={{ fontSize: "0.8125rem", color: "rgba(255,255,255,0.45)", marginTop: "0.3rem" }}>
+                  Pon–Pt 8:00–18:00
+                </p>
+              </div>
             </a>
+
+            {/* E-mail */}
             <a
               href={`mailto:${CONTACT_SNIPPET.email}`}
               style={{
-                display: "inline-flex", alignItems: "center", gap: "0.625rem",
-                fontSize: "1.0625rem", fontWeight: 700, color: "var(--gold)",
+                display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center",
+                padding: "2.5rem 2rem",
+                background: "var(--gold)",
+                border: "1px solid var(--gold)",
                 transition: "opacity var(--transition)",
+                textDecoration: "none",
+                gap: "1rem",
               }}
-              className="hover:opacity-80"
+              className="hover:opacity-90"
             >
-              <Mail size={18} aria-hidden /> {CONTACT_SNIPPET.email}
+              <span style={{
+                display: "inline-flex", alignItems: "center", justifyContent: "center",
+                width: "3.5rem", height: "3.5rem", borderRadius: "var(--radius-full)",
+                background: "var(--navy)", color: "var(--gold)",
+              }}>
+                <Mail size={20} aria-hidden />
+              </span>
+              <div>
+                <p style={{ fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(10,18,30,0.6)", marginBottom: "0.4rem" }}>
+                  Napisz do nas
+                </p>
+                <p style={{
+                  fontFamily: "var(--font-heading, 'Montserrat', sans-serif)",
+                  fontWeight: 800, fontSize: "clamp(0.95rem, 1.5vw, 1.1rem)",
+                  color: "var(--navy)", letterSpacing: "-0.01em",
+                  wordBreak: "break-all",
+                }}>
+                  {CONTACT_SNIPPET.email}
+                </p>
+                <p style={{ fontSize: "0.8125rem", color: "rgba(10,18,30,0.55)", marginTop: "0.3rem" }}>
+                  Odpowiadamy w ciągu 24h
+                </p>
+              </div>
             </a>
+
+            {/* Lokalizacja */}
+            <div style={{
+              display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center",
+              padding: "2.5rem 2rem",
+              background: "rgba(255,255,255,0.04)",
+              border: "1px solid rgba(255,255,255,0.1)",
+              gap: "1rem",
+            }}>
+              <span style={{
+                display: "inline-flex", alignItems: "center", justifyContent: "center",
+                width: "3.5rem", height: "3.5rem", borderRadius: "var(--radius-full)",
+                background: "var(--gold)", color: "var(--navy)",
+              }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+                  <circle cx="12" cy="9" r="2.5"/>
+                </svg>
+              </span>
+              <div>
+                <p style={{ fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(255,255,255,0.45)", marginBottom: "0.4rem" }}>
+                  Obszar działania
+                </p>
+                <p style={{
+                  fontFamily: "var(--font-heading, 'Montserrat', sans-serif)",
+                  fontWeight: 800, fontSize: "clamp(1.1rem, 2vw, 1.35rem)",
+                  color: "var(--white)",
+                }}>
+                  Rzeszów
+                </p>
+                <p style={{ fontSize: "0.8125rem", color: "rgba(255,255,255,0.45)", marginTop: "0.3rem" }}>
+                  i całe Podkarpacie
+                </p>
+              </div>
+            </div>
           </div>
-          <div style={{ marginTop: "2.5rem" }}>
-            <Link href="/kontakt" className="wp-btn-primary">
+
+          {/* CTA button */}
+          <div style={{ textAlign: "center", marginTop: "3rem" }}>
+            <Link href="/kontakt" className="wp-btn-primary" style={{ fontSize: "1rem", padding: "0.9rem 2.5rem" }}>
               Wypełnij formularz kontaktowy <ArrowRight size={16} aria-hidden />
             </Link>
           </div>
+
         </div>
       </section>
     </>

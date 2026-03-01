@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { createCaller } from "~/server/api/trpc/server";
 import { canonical } from "~/lib/seo";
 import { Breadcrumbs } from "~/components/Breadcrumbs";
+import { getCachedUslugi } from "~/lib/data-cache";
+
+export const revalidate = 3600; // ISR: regeneruj co 1 h
 
 export const metadata: Metadata = {
   title: "Usługi",
@@ -18,8 +20,7 @@ export const metadata: Metadata = {
 };
 
 export default async function UslugiPage() {
-  const caller = await createCaller();
-  const uslugi = await caller.content.getUslugi();
+  const uslugi = await getCachedUslugi();
 
   return (
     <div className="wp-section mx-auto max-w-4xl px-4 py-12">

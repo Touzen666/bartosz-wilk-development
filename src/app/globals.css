@@ -12,10 +12,10 @@
   --charcoal:      #1e293b;
   --charcoal-soft: #334155;
   --slate:         #64748b;
-  --gold:          #c8920a;
-  --gold-hover:    #a87508;
-  --gold-light:    #fef3c7;
-  --gold-muted:    #fffbeb;
+  --gold:          #f0a500;
+  --gold-hover:    #d49200;
+  --gold-light:    #fff8e1;
+  --gold-muted:    #fffbf0;
   --offwhite:      #f9f9f9;
   --offwhite-warm: #f4f5f7;
   --white:         #ffffff;
@@ -378,6 +378,258 @@
     position: relative;
     z-index: 2;
   }
+
+  /* ── Dark section ── */
+  .section-dark {
+    background: var(--navy);
+    color: var(--white);
+  }
+
+  /* ── Service icon card (icon centred, Construction-WP style) ── */
+  .service-icon-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-card);
+    padding: 2.25rem 1.5rem 2rem;
+    text-align: center;
+    transition: box-shadow var(--transition-slow), border-color var(--transition), transform var(--transition-slow);
+  }
+
+  .service-icon-card:hover {
+    box-shadow: var(--shadow-card-hover);
+    border-color: var(--gold);
+    transform: translateY(-5px);
+  }
+
+  .service-icon-card .sic-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 4rem;
+    height: 4rem;
+    border-radius: var(--radius-xl);
+    background: var(--gold-muted);
+    color: var(--gold);
+    margin-bottom: 1.1rem;
+    transition: background var(--transition), color var(--transition);
+  }
+
+  .service-icon-card:hover .sic-badge {
+    background: var(--gold);
+    color: var(--white);
+  }
+
+  /* ── Stats bar (dark variant) ── */
+  .stats-dark-bar {
+    background: var(--navy);
+    border-top: 3px solid var(--gold);
+  }
+
+  .stats-dark-bar .stat-number {
+    color: var(--gold);
+  }
+
+  .stats-dark-bar .stat-label {
+    color: rgba(255,255,255,0.6);
+  }
+
+  .stats-dark-bar li + li {
+    border-left: 1px solid rgba(255,255,255,0.1);
+  }
+
+  /* ── Gold left-border accent ── */
+  .gold-border-left {
+    border-left: 4px solid var(--gold);
+    padding-left: 1.25rem;
+  }
+
+  /* ── Process step (split section) ── */
+  .process-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.25rem;
+  }
+
+  .process-step .step-num {
+    font-family: var(--font-heading, 'Montserrat', sans-serif);
+    font-size: 2rem;
+    font-weight: 900;
+    color: var(--gold);
+    line-height: 1;
+    flex-shrink: 0;
+    min-width: 2.5rem;
+  }
+
+  /* ── Section label with dash ── */
+  .section-label-dash {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: var(--font-heading, 'Montserrat', sans-serif);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 0.75rem;
+  }
+
+  .section-label-dash::before {
+    content: '';
+    display: inline-block;
+    width: 2rem;
+    height: 2px;
+    background: var(--gold);
+    flex-shrink: 0;
+  }
+
+  /* ── Stats split (yellow left + white right) ── */
+  .stats-split {
+    display: grid;
+    min-height: 320px;
+  }
+
+  .stats-split-left {
+    background: var(--gold);
+    padding: clamp(2.5rem, 5vw, 4rem);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1.25rem;
+  }
+
+  .stats-split-right {
+    background: var(--white);
+    padding: clamp(2rem, 4vw, 3.5rem);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    box-shadow: var(--shadow-lg);
+  }
+
+  .stat-item {
+    padding: 1.75rem 1.5rem;
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .stat-item:nth-child(2n) { border-right: none; }
+  .stat-item:nth-child(n+3) { border-bottom: none; }
+
+  .stat-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: var(--radius-full);
+    background: var(--gold);
+    color: var(--white);
+    flex-shrink: 0;
+  }
+
+  .stat-value {
+    font-family: var(--font-heading, 'Montserrat', sans-serif);
+    font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+    font-weight: 800;
+    color: var(--navy);
+    line-height: 1;
+    display: block;
+  }
+
+  .stat-desc {
+    font-size: 0.8125rem;
+    color: var(--slate);
+    margin-top: 0.3rem;
+    line-height: 1.4;
+  }
+
+  /* ── Service photo card ── */
+  .spc {
+    background: var(--white);
+    box-shadow: var(--shadow-card);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    transition: box-shadow var(--transition-slow), transform var(--transition-slow);
+  }
+
+  .spc:hover {
+    box-shadow: var(--shadow-card-hover);
+    transform: translateY(-4px);
+  }
+
+  .spc-photo {
+    position: relative;
+    aspect-ratio: 16/10;
+    overflow: hidden;
+    background: var(--offwhite-warm);
+  }
+
+  .spc-photo img {
+    transition: transform 0.55s ease;
+  }
+
+  .spc:hover .spc-photo img {
+    transform: scale(1.06);
+  }
+
+  .spc-body {
+    padding: 1.5rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .spc-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: var(--radius-md);
+    background: var(--gold);
+    color: var(--white);
+    flex-shrink: 0;
+    transition: background var(--transition);
+  }
+
+  /* ── Split dark-yellow CTA ── */
+  .split-dg {
+    display: grid;
+    min-height: 420px;
+  }
+
+  .split-dg-dark {
+    background: var(--navy);
+    position: relative;
+    overflow: hidden;
+    padding: clamp(3rem, 6vw, 5rem) clamp(1.5rem, 4vw, 3.5rem);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1.5rem;
+  }
+
+  .split-dg-yellow {
+    background: var(--gold);
+    padding: clamp(3rem, 6vw, 5rem) clamp(1.5rem, 4vw, 3.5rem);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1.75rem;
+  }
+
+  /* ── Breadcrumb link hover ── */
+  .breadcrumb-link:hover {
+    color: var(--gold) !important;
+  }
+
+  /* ── Slider track — ukryj scrollbar ── */
+  .slider-track::-webkit-scrollbar { display: none; }
 
   /* ── GEO Speakable (invisible marker) ── */
   .geo-speakable {}

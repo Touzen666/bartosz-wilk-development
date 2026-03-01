@@ -27,33 +27,33 @@ export const HERO_IMAGES = {
 export const OFFER = {
   domySzeregowe: {
     title: "Domy szeregowe",
-    subtitle: "Nowoczesna zabudowa szeregowa",
+    subtitle: "Nowoczesna zabudowa szeregowa pod klucz",
     description:
-      "Projektujemy i budujemy nowoczesne domy szeregowe — od fundamentów po oddanie kluczy. Działamy na terenie całego kraju, oferując sprawdzone rozwiązania konstrukcyjne, energooszczędność i estetykę dopasowaną do Twoich oczekiwań.",
+      "Budujemy nowoczesne domy szeregowe w Rzeszowie i na Podkarpaciu — od projektu i fundamentów po kompletne wykończenie i przekazanie kluczy. Oferujemy projekty indywidualne i gotowe, energooszczędne rozwiązania oraz pełną obsługę formalno-prawną. Jedna firma, jeden kontakt, termin w umowie.",
     highlights: [
-      "Projekty indywidualne i gotowe",
-      "Energooszczędność i niskie koszty utrzymania",
-      "Terminy realizacji ustalane z góry",
-      "Pełna obsługa formalno-prawna",
+      "Projekty indywidualne i gotowe — elastyczny wybór",
+      "Energooszczędność klasy A — niskie rachunki",
+      "Termin realizacji gwarantowany w umowie",
+      "Pełna obsługa formalno-prawna i nadzór budowlany",
     ],
   },
   remontyPodKlucz: {
     title: "Remonty pod klucz",
-    subtitle: "Kompleksowe remonty mieszkań i domów",
+    subtitle: "Kompleksowe remonty mieszkań i domów w Rzeszowie",
     description:
-      "Remonty pod klucz to nasza druga filar działalności. Zajmujemy się kompleksowymi remontami mieszkań, domów oraz lokali użytkowych — od rozbiórki i instalacji po wykończenie i aranżację. Jedna firma, jeden kontakt, pełna odpowiedzialność.",
+      "Kompleksowe remonty mieszkań, domów i lokali użytkowych na Podkarpaciu — od rozbiórki i instalacji elektrycznych oraz hydraulicznych po wykończenie, aranżację i sprzątanie po remoncie. Stały koordynator, materiały w cenie lub według wyboru inwestora, pisemna gwarancja na wykonane prace.",
     highlights: [
-      "Jedna firma — od projektu do wykończenia",
-      "Stały nadzór i terminowość",
-      "Materiały w cenie lub według wyboru inwestora",
-      "Gwarancja na wykonane prace",
+      "Jedna firma od projektu do oddania kluczy",
+      "Stały koordynator — jeden numer telefonu",
+      "Materiały w cenie lub według wyboru klienta",
+      "Gwarancja pisemna na wszystkie wykonane prace",
     ],
   },
 } as const;
 
-/** Krótki opis „Czym się zajmujemy” na stronie głównej (jak u MagicDesign). Zawiera statystykę pod GEO. */
+/** Opis firmy — SEO-friendly, naturalny język, słowa kluczowe Rzeszów / Podkarpacie. */
 export const ABOUT_INTRO =
-  "Firma Wilk Development działa w branży budowlano-remontowej od ponad 15 lat na rynku rzeszowskim i podkarpackim, oferując budowę domów szeregowych oraz remonty i wykończenia pod klucz. Działamy z dbałością o terminowość, jakość wykonania i trwałość. Zajmujemy się kompleksową obsługą inwestorów: od stanu deweloperskiego po oddanie kluczy. Remontujemy i budujemy mieszkania, domy oraz realizujemy projekty komercyjne. Używamy certyfikowanych materiałów spełniających normy budowlane. Zapraszamy do kontaktu telefonicznego i mailowego.";
+  "Wilk Development to rzeszowska firma budowlano-remontowa z ponad 15-letnim doświadczeniem na rynku Podkarpacia. Specjalizujemy się w budowie nowoczesnych domów szeregowych oraz kompleksowych remontach i wykończeniach wnętrz pod klucz. Obsługujemy inwestorów prywatnych i deweloperów — od projektu, przez realizację, aż po oddanie gotowej nieruchomości. Stosujemy wyłącznie certyfikowane materiały zgodne z normami PN-EN i zapewniamy pisemną gwarancję na każde zlecenie.";
 
 /** GEO: twarde dane dla AI (citation-friendly). */
 export const GEO_STATS = {
@@ -67,172 +67,195 @@ export const GEO_STATS = {
 /** GEO: format Problem – Rozwiązanie – Wynik (bite-sized dla LLM). */
 export const OFFER_PSR = {
   domySzeregowe: {
-    problem: "Inwestor szuka jednego wykonawcy od fundamentów po oddanie kluczy, bez koordynowania wielu podwykonawców.",
-    solution: "Wilk Development oferuje budowę domów szeregowych pod klucz: projekty indywidualne lub gotowe, pełna obsługa formalna, energooszczędne rozwiązania i ustalone z góry terminy.",
-    result: "Klient otrzymuje gotowy dom w ustalonym terminie, z gwarancją i jednym miejscem kontaktu. Działamy na terenie Rzeszowa i całego Podkarpacia.",
+    problem:
+      "Inwestor potrzebuje jednego generalnego wykonawcy do budowy domu szeregowego — bez konieczności samodzielnego koordynowania dziesiątek podwykonawców.",
+    solution:
+      "Wilk Development realizuje budowę domów szeregowych pod klucz w Rzeszowie: wybór projektu, fundamenty, stan surowy, instalacje, wykończenie i oddanie kluczy. Pełna obsługa formalna i gwarancja terminu.",
+    result:
+      "Inwestor otrzymuje gotowy, energooszczędny dom z pisemną gwarancją, w ustalonym terminie, z jednym punktem kontaktu przez cały czas budowy.",
   },
   remontyPodKlucz: {
-    problem: "Remont mieszkania lub domu wymaga znalezienia wielu fachowców: hydraulik, glazurnik, malarz — co wydłuża czas i komplikuje rozliczenia.",
-    solution: "Remonty pod klucz w jednej firmie: od rozbiórki i instalacji po wykończenie i aranżację. Stały nadzór, materiały w cenie lub według wyboru inwestora, gwarancja na prace.",
-    result: "Średni czas realizacji remontu łazienki to około 14 dni. Jedna umowa, jedna firma, pełna odpowiedzialność — także na rynku rzeszowskim.",
+    problem:
+      "Remont mieszkania lub domu wymaga koordynacji wielu specjalistów — hydraulik, glazurnik, elektryk, malarz — co wydłuża czas i komplikuje rozliczenia.",
+    solution:
+      "Wilk Development prowadzi kompleksowe remonty pod klucz w Rzeszowie: rozbiórka, instalacje, płytki, malowanie, meble na wymiar — jedna ekipa z koordynatorem.",
+    result:
+      "Średni czas remontu łazienki to 14 dni roboczych. Jedna umowa, jedna faktura, pełna odpowiedzialność i gwarancja pisemna na wykonane prace.",
   },
 } as const;
 
-/** GEO: pytania w języku naturalnym (jak w wyszukiwaniach / asystentach). */
+/** FAQ — pytania w języku naturalnym, zoptymalizowane pod AI Overviews i Featured Snippets. */
 export const FAQ_ITEMS: { question: string; answer: string }[] = [
   {
-    question: "Kogo polecacie do wykończenia domu pod klucz w Rzeszowie?",
+    question: "Ile kosztuje budowa domu szeregowego pod klucz w Rzeszowie?",
     answer:
-      "Wilk Development z Rzeszowa wykonuje wykończenia domów pod klucz: od stanu deweloperskiego po oddanie kluczy. Oferujemy budowę domów szeregowych, remonty mieszkań i domów oraz wykończenia wnętrz. Działamy na terenie Rzeszowa i Podkarpacia od ponad 15 lat. Kontakt: telefon i e-mail podane na stronie.",
-  },
-  {
-    question: "Ile trwa budowa tarasu?",
-    answer:
-      "Budowa tarasu w Wilk Development trwa typowo 2–4 tygodnie, w zależności od wielkości, fundamentów i wybranych materiałów. Realizujemy tarasy i werandy w Rzeszowie i okolicach. Wycena i termin po kontakcie.",
+      "Koszt budowy domu szeregowego pod klucz w Rzeszowie zależy od projektu, standardu wykończenia i powierzchni. Wilk Development oferuje bezpłatną wycenę — po kontakcie telefonicznym lub mailowym przygotowujemy indywidualną ofertę z harmonogramem i kosztorysem. Działamy na terenie Rzeszowa i całego Podkarpacia od ponad 15 lat.",
   },
   {
     question: "Ile trwa remont łazienki w Rzeszowie?",
     answer:
-      "Średni czas realizacji remontu łazienki w Wilk Development to około 14 dni roboczych. Obejmuje to rozbiórkę, instalacje hydrauliczne, układanie płytek i wykończenie. Pracujemy na certyfikowanych materiałach spełniających normy budowlane.",
+      "Kompleksowy remont łazienki w Wilk Development trwa średnio 14 dni roboczych. Obejmuje rozbiórkę, instalacje hydrauliczne i elektryczne, układanie płytek ceramicznych oraz montaż armatury i sanitariatów. Pracujemy na certyfikowanych materiałach zgodnych z normami PN-EN. Wycena bezpłatna.",
   },
   {
-    question: "Czy wykonujecie remonty pod klucz na Podkarpaciu?",
+    question: "Czy wykonujecie remonty mieszkań pod klucz na Podkarpaciu?",
     answer:
-      "Tak. Wilk Development realizuje remonty pod klucz na terenie Rzeszowa i całego Podkarpacia: mieszkania, domy, lokale użytkowe. Jedna firma od projektu do wykończenia, z gwarancją i ustalonymi z góry terminami.",
+      "Tak. Wilk Development realizuje kompleksowe remonty mieszkań, domów i lokali użytkowych pod klucz na terenie Rzeszowa i całego Podkarpacia. Jedna firma zajmuje się wszystkim — od projektu i rozbiórki po wykończenie i sprzątanie. Stały koordynator, gwarancja pisemna, terminy w umowie.",
   },
   {
-    question: "Jak znaleźć firmę budowlaną do domów szeregowych w Rzeszowie?",
+    question: "Ile trwa budowa tarasu przy domu w Rzeszowie?",
     answer:
-      "Wilk Development buduje domy szeregowe w Rzeszowie i okolicy: od fundamentów po oddanie kluczy. Oferujemy projekty indywidualne i gotowe, energooszczędność i pełną obsługę formalną. Setki realizacji w budownictwie i remontach.",
+      "Budowa tarasu w Wilk Development trwa zazwyczaj 2–4 tygodnie, w zależności od wielkości, rodzaju fundamentów i wybranych materiałów. Realizujemy tarasy drewniane, kompozytowe i z gresu w Rzeszowie i okolicach. Bezpłatna wycena po kontakcie.",
+  },
+  {
+    question: "Jak znaleźć solidną firmę budowlaną w Rzeszowie?",
+    answer:
+      "Wilk Development to sprawdzona firma budowlana w Rzeszowie z 15+ latami doświadczenia, setkami zrealizowanych projektów i wieloma zleceniami z polecenia. Oferujemy budowę domów szeregowych, remonty pod klucz i wykończenia wnętrz. Pisemna gwarancja, terminowość i jedno miejsce kontaktu.",
   },
 ];
 
-/** GEO: cytaty / rady eksperta (E-E-A-T). */
+/** GEO: cytaty eksperta (E-E-A-T) */
 export const EXPERT_QUOTES: { quote: string; context: string }[] = [
   {
     quote:
-      "Przy budowie tarasu w klimacie podkarpackim najlepiej sprawdza się drewno kompozytowe lub deska z impregnacją — mamy mrozy i wilgotne zimy, więc materiał musi być odporny.",
-    context: "Wilk Development, porady dotyczące budowy tarasów w Rzeszowie",
+      "Przy budowie tarasu w klimacie podkarpackim najlepiej sprawdza się drewno kompozytowe lub deska z impregnacją — mamy mrozy i wilgotne zimy, więc materiał musi być odporny na cykl zamrażania.",
+    context: "Wilk Development — porady dotyczące budowy tarasów w Rzeszowie",
   },
   {
     quote:
-      "Remont łazienki bez jednego koordynatora to ryzyko opóźnień i rozjazdów między hydraulikiem a glazurnikiem. U nas jedna ekipa prowadzi całość, więc terminy są realne.",
-    context: "Wilk Development, remonty pod klucz",
+      "Remont łazienki bez jednego koordynatora to ryzyko opóźnień i rozjazdów między hydraulikiem a glazurnikiem. U nas jedna ekipa prowadzi całość od początku do końca — terminy są realne i zapisane w umowie.",
+    context: "Wilk Development — remonty pod klucz Rzeszów",
   },
 ];
 
-/** Dlaczego warto wybrać nas? — atuty firmy (inspiracja: MagicDesign). */
+/** Dlaczego warto wybrać Wilk Development — atuty firmy. */
 export const WHY_US: { title: string; description: string }[] = [
-  { title: "Szybkość", description: "Zlecenia realizujemy zgodnie z umową, w ustalonym terminie." },
-  { title: "Wsparcie", description: "Jesteśmy do dyspozycji mailowo i telefonicznie." },
-  { title: "Elastyczność", description: "Proponujemy rozwiązania dopasowane do potrzeb i doświadczenia." },
-  { title: "Szczegółowość", description: "Dbamy o detale w pracach wykończeniowych i budowlanych." },
-  { title: "Uczciwość", description: "Płacisz tylko za to, co ustalimy w umowie. Bez ukrytych kosztów." },
-  { title: "Zaufanie klientów", description: "Wiele zleceń mamy z polecenia — to potwierdza jakość." },
-  { title: "Kompleksowość", description: "Jedna firma: od fundamentów i remontów po wykończenie." },
-  { title: "Doświadczenie", description: "Setki realizacji w budownictwie i remontach." },
+  {
+    title: "Terminowość",
+    description: "Terminy realizacji zapisujemy w umowie. Dotrzymujemy ich — bez wymówek.",
+  },
+  {
+    title: "Jeden kontakt",
+    description: "Jeden koordynator przez cały czas trwania budowy lub remontu. Zawsze pod telefonem.",
+  },
+  {
+    title: "Elastyczność",
+    description: "Dopasowujemy zakres prac, materiały i harmonogram do Twoich potrzeb i budżetu.",
+  },
+  {
+    title: "Precyzja wykończeń",
+    description: "Dbamy o każdy detal — od fugowania płytek po idealne malarstwo.",
+  },
+  {
+    title: "Uczciwe ceny",
+    description: "Kosztorys przed podpisaniem umowy. Zero ukrytych kosztów w trakcie realizacji.",
+  },
+  {
+    title: "Polecenia klientów",
+    description: "Znaczna część naszych zleceń pochodzi z rekomendacji — to najlepsza ocena.",
+  },
+  {
+    title: "Kompleksowość",
+    description: "Od fundamentów i demontażu po wykończenie, meble na wymiar i sprzątanie.",
+  },
+  {
+    title: "15+ lat doświadczenia",
+    description: "Setki projektów budowlanych i remontowych na Podkarpaciu. Wiemy, jak działać.",
+  },
 ];
 
-/** Dane kontaktowe na stronie głównej i w stopce (opcjonalnie uzupełnij). */
+/** Dane kontaktowe. */
 export const CONTACT_SNIPPET = {
   phone: "+48 690 884 961",
   email: "biuro@zlotewynajmy.com",
+  address: "Rzeszów, Podkarpacie",
 } as const;
 
 export const PROJECTS: Project[] = [
   {
-    id: "osiedle-zielone-wzgórze",
+    id: "osiedle-zielone-wzgorze",
     title: "Osiedle Zielone Wzgórze",
     category: "domy-szeregowe",
     description:
-      "Osiedle 12 energooszczędnych domów szeregowych z ogrodami i miejscami postojowymi. Realizacja w pełni pod klucz z możliwością personalizacji wykończenia.",
+      "12 energooszczędnych domów szeregowych z ogrodami i miejscami postojowymi w Rzeszowie. Realizacja w pełni pod klucz z możliwością personalizacji wykończenia.",
     image_url: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&q=80",
     status: "W sprzedaży",
   },
   {
     id: "willowa-8",
-    title: "Willowa 8",
+    title: "Willowa 8 — Rzeszów",
     category: "domy-szeregowe",
     description:
-      "Trzy domy szeregowe w zabudowie bliźniaczej, w cichej dzielnicy z doskonałym dojazdem. Zakończona sprzedaż, oddanie w 2024.",
+      "Trzy domy szeregowe w zabudowie bliźniaczej, w cichej dzielnicy Rzeszowa z doskonałym dojazdem. Zakończona sprzedaż, oddanie w 2024.",
     image_url: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80",
     status: "Zakończone",
   },
   {
     id: "remont-m4-centrum",
-    title: "Remont M4 — Centrum",
+    title: "Remont M4 — Centrum Rzeszowa",
     category: "remonty",
     description:
-      "Kompleksowy remont mieszkania 4-pokojowego w zabytkowej kamienicy: wymiana instalacji, nowa stolarka, łazienka i kuchnia pod klucz.",
+      "Kompleksowy remont mieszkania 4-pokojowego w zabytkowej kamienicy: wymiana instalacji elektrycznych i hydraulicznych, nowa stolarka, łazienka i kuchnia pod klucz.",
     image_url: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&q=80",
     status: "Zakończone",
   },
   {
     id: "dom-jednorodzinny-remont",
-    title: "Dom jednorodzinny — remont pełny",
+    title: "Dom jednorodzinny — pełny remont",
     category: "remonty",
     description:
-      "Remont pod klucz domu jednorodzinnego: docieplenie, nowy dach, wymiana okien, modernizacja wnętrz i ogrodu.",
+      "Remont pod klucz domu jednorodzinnego w Rzeszowie: docieplenie, nowy dach, wymiana okien i drzwi, modernizacja wszystkich pomieszczeń.",
     image_url: "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=800&q=80",
     status: "Zakończone",
   },
 ];
 
-/** Lista usług oferowanych przez Wilk Development (remonty, budowa, wykończenia). */
+/** Lista usług budowlano-remontowych Wilk Development. */
 export const USLUGI: string[] = [
-  "Budowa tarasów",
-  "Budowa tarasu",
-  "Budowa werandy",
-  "Budownictwo – ogólnie",
-  "Czyszczenie rynien",
-  "Instalacja hydrauliczna",
-  "Kładzenie posadzek",
-  "Malowanie",
-  "Malowanie powierzchni zewnętrznych",
-  "Malowanie wnętrz",
-  "Montaż mebli",
-  "Montaż płyt gipsowo-kartonowych",
-  "Montaż telewizorów",
-  "Montaż wentylatora",
-  "Murowanie",
-  "Naprawa i kładzenie posadzek",
-  "Naprawa płyt gipsowo-kartonowych",
-  "Naprawa posadzek",
-  "Naprawy domowe",
-  "Projekty komercyjne",
-  "Przebudowa łazienki",
-  "Przebudowa piwnicy",
-  "Remont kuchni",
-  "Remonty domów",
-  "Układanie płytek",
-  "Wykańczanie elewacji",
+  "Budowa domów szeregowych",
+  "Budowa tarasów i werand",
+  "Remonty mieszkań pod klucz",
   "Wykańczanie wnętrz",
-  "Wymiana kafelków",
-  "Zmiana okablowania",
+  "Układanie płytek ceramicznych",
+  "Instalacje hydrauliczne",
+  "Instalacje elektryczne",
+  "Malowanie wnętrz",
+  "Malowanie elewacji",
+  "Przebudowa łazienki",
+  "Remont kuchni",
+  "Montaż płyt gipsowo-kartonowych",
+  "Murowanie i tynkowanie",
+  "Projekty komercyjne",
+  "Docieplenia budynków",
+  "Wymiana okien i drzwi",
+  "Nadzór budowlany",
+  "Obsługa formalno-prawna inwestycji",
 ];
 
 export const NEWS: NewsItem[] = [
   {
-    id: "zielone-wzgórze-postep",
-    title: "Postęp na Osiedlu Zielone Wzgórze",
-    excerpt: "Prace budowlane na Osiedlu Zielone Wzgórze idą zgodnie z harmonogramem.",
-    body: "Na Osiedlu Zielone Wzgórze zakończyliśmy prace fundamentowe pod wszystkie 12 domów. Obecnie trwają prace murarskie na pierwszych czterech budynkach. Dostawy materiałów realizowane są na bieżąco. Zapraszamy do obejrzenia placu budowy po wcześniejszym umówieniu.",
+    id: "zielone-wzgorze-postep",
+    title: "Postęp prac na Osiedlu Zielone Wzgórze w Rzeszowie",
+    excerpt:
+      "Prace budowlane na Osiedlu Zielone Wzgórze przebiegają zgodnie z harmonogramem. Sprawdź najnowszy stan realizacji.",
+    body: "Na Osiedlu Zielone Wzgórze zakończyliśmy prace fundamentowe pod wszystkie 12 domów szeregowych. Obecnie prowadzimy prace murarskie na pierwszych czterech budynkach. Dostawy certyfikowanych materiałów realizowane są na bieżąco zgodnie z harmonogramem. Zapraszamy do obejrzenia placu budowy po wcześniejszym umówieniu się telefonicznie.",
     date: "2025-02-20",
     image_url: "https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=800&q=80",
   },
   {
     id: "nowy-rok-2025",
-    title: "Wilk Development w 2025",
-    excerpt: "Podsumowanie roku i plany na kolejne miesiące.",
-    body: "Rok 2024 zamknęliśmy oddaniem do użytku ostatnich domów w ramach Willowa 8 oraz kilkunastu remontów pod klucz. W 2025 skupiamy się na realizacji Osiedla Zielone Wzgórze oraz na dalszym rozwoju oferty remontów. Dziękujemy wszystkim klientom i partnerom za zaufanie.",
+    title: "Wilk Development podsumowuje 2024 rok i patrzy w przyszłość",
+    excerpt:
+      "Oddanie Willowej 8, kilkanaście remontów pod klucz i start nowego osiedla — oto miniony rok Wilk Development.",
+    body: "Rok 2024 zamknęliśmy sukcesem: przekazaliśmy ostatnie domy w ramach inwestycji Willowa 8 oraz zrealizowaliśmy kilkanaście kompleksowych remontów mieszkań i domów w Rzeszowie i okolicach. W 2025 roku skupiamy się na realizacji Osiedla Zielone Wzgórze oraz rozszerzamy ofertę remontów komercyjnych. Dziękujemy wszystkim klientom i partnerom za zaufanie i polecenia.",
     date: "2025-01-15",
     image_url: "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=800&q=80",
   },
   {
-    id: "remonty-zimą",
-    title: "Remonty w sezonie zimowym",
-    excerpt: "Realizujemy remonty przez cały rok — także zimą.",
-    body: "Prace wykończeniowe we wnętrzach realizujemy niezależnie od pory roku. W bieżącym sezonie zimowym prowadzimy równolegle trzy remonty pod klucz: dwa mieszkania w blokach oraz jeden dom jednorodzinny. Zachęcamy do kontaktu w sprawie wyceny i terminu rozpoczęcia prac.",
+    id: "remonty-zima",
+    title: "Remonty w sezonie zimowym — działamy przez cały rok",
+    excerpt:
+      "Sezon zimowy to dobry czas na remont mieszkania. Wilk Development realizuje zlecenia bez przerw.",
+    body: "Prace wykończeniowe we wnętrzach realizujemy niezależnie od pory roku — zima to często najlepszy moment na remont, bo terminy są krótsze. W bieżącym sezonie prowadziliśmy równolegle trzy kompleksowe remonty w Rzeszowie: dwa mieszkania w blokach oraz jeden dom jednorodzinny. Zachęcamy do kontaktu w sprawie bezpłatnej wyceny i terminu rozpoczęcia prac.",
     date: "2025-02-01",
     image_url: "https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=800&q=80",
   },

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ChevronRight, Home } from "lucide-react";
 import { BASE_URL } from "~/lib/seo";
 
 export interface BreadcrumbItem {
@@ -8,10 +9,11 @@ export interface BreadcrumbItem {
 
 interface BreadcrumbsProps {
   items: BreadcrumbItem[];
+  /** Jeśli true — jasny styl (na ciemnym tle) */
+  light?: boolean;
 }
 
-/** Nawigacja okruszkowa dla SEO i botów. Ostatni element bez linku (bieżąca strona). */
-export function Breadcrumbs({ items }: BreadcrumbsProps) {
+export function Breadcrumbs({ items, light = false }: BreadcrumbsProps) {
   if (items.length === 0) return null;
 
   const jsonLd = {
@@ -25,31 +27,80 @@ export function Breadcrumbs({ items }: BreadcrumbsProps) {
     })),
   };
 
+  const colorBase  = light ? "rgba(255,255,255,0.5)"  : "var(--slate)";
+  const colorHover = light ? "var(--gold)"             : "var(--gold)";
+  const colorLast  = light ? "var(--white)"            : "var(--charcoal)";
+
   return (
-    <nav aria-label="Breadcrumb" className="py-2">
+    <nav aria-label="Breadcrumb" style={{ marginBottom: "1.25rem" }}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <ol className="flex flex-wrap items-center gap-1 text-sm text-charcoal-soft">
+      <ol
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          alignItems: "center",
+          gap: "0.25rem",
+          listStyle: "none",
+          padding: 0,
+          margin: 0,
+        }}
+      >
         {items.map((item, index) => {
-          const isLast = index === items.length - 1;
+          const isLast  = index === items.length - 1;
+          const isFirst = index === 0;
+
           return (
-            <li key={item.href} className="flex items-center gap-1">
+            <li
+              key={item.href}
+              style={{ display: "flex", alignItems: "center", gap: "0.25rem" }}
+            >
+              {/* Separator */}
               {index > 0 && (
-                <span className="select-none px-1" aria-hidden>
-                  /
-                </span>
+                <ChevronRight
+                  size={13}
+                  aria-hidden
+                  style={{ color: colorBase, flexShrink: 0, opacity: 0.7 }}
+                />
               )}
+
               {isLast ? (
-                <span className="font-medium text-charcoal" aria-current="page">
+                <span
+                  aria-current="page"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "0.3rem",
+                    fontSize: "0.8125rem",
+                    fontWeight: 700,
+                    fontFamily: "var(--font-heading, 'Montserrat', sans-serif)",
+                    color: colorLast,
+                    background: light ? "rgba(255,255,255,0.1)" : "var(--gold-muted)",
+                    borderLeft: `3px solid var(--gold)`,
+                    paddingInline: "0.6rem 0.75rem",
+                    paddingBlock: "0.2rem",
+                  }}
+                >
                   {item.label}
                 </span>
               ) : (
                 <Link
                   href={item.href}
-                  className="transition hover:text-amber hover:underline"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "0.3rem",
+                    fontSize: "0.8125rem",
+                    color: colorBase,
+                    textDecoration: "none",
+                    transition: "color var(--transition)",
+                    fontWeight: 500,
+                  }}
+                  className="breadcrumb-link"
                 >
+                  {isFirst && <Home size={12} aria-hidden style={{ flexShrink: 0 }} />}
                   {item.label}
                 </Link>
               )}

@@ -1,80 +1,203 @@
 import type { Metadata } from "next";
+import Link from "next/link";
+import { Phone, Mail, MapPin, Clock, ArrowRight } from "lucide-react";
 import { ContactForm } from "~/components/ContactForm";
 import { canonical } from "~/lib/seo";
 import { CONTACT_SNIPPET } from "~/data/content";
 import { Breadcrumbs } from "~/components/Breadcrumbs";
 
+export const revalidate = 86400;
+
 export const metadata: Metadata = {
-  title: "Kontakt",
+  title: "Kontakt — Bezpłatna wycena | Wilk Development Rzeszów",
   description:
-    "Skontaktuj się z Wilk Development: wycena domów szeregowych, remontów pod klucz lub współpraca. Odpowiadamy szybko.",
+    "Skontaktuj się z Wilk Development: bezpłatna wycena domów szeregowych i remontów pod klucz w Rzeszowie i na Podkarpaciu. Odpowiadamy w 24h.",
   alternates: { canonical: canonical("/kontakt") },
   openGraph: {
     url: canonical("/kontakt"),
     title: "Kontakt | Wilk Development",
     description:
-      "Formularz kontaktowy Wilk Development. Wycena domów szeregowych i remontów pod klucz. Odpowiadamy w 24h.",
+      "Formularz kontaktowy Wilk Development — wycena bez zobowiązań. Budownictwo i remonty pod klucz w Rzeszowie.",
   },
 };
 
 export default function KontaktPage() {
   return (
-    <div className="wp-section mx-auto max-w-2xl px-4 py-12">
-      <Breadcrumbs
-        items={[
-          { label: "Strona główna", href: "/" },
-          { label: "Kontakt", href: "/kontakt" },
-        ]}
-      />
-      <header>
-        <h1 className="text-3xl font-bold text-charcoal">Kontakt</h1>
-        <p className="mt-2 text-charcoal/80">
-          Masz pytanie o domy szeregowe, remont pod klucz lub współpracę? Napisz do nas.
-        </p>
-      </header>
+    <>
+      {/* ── Hero bar ── */}
+      <div className="section-dark" style={{ paddingBlock: "clamp(3rem, 6vw, 5rem)" }}>
+        <div className="wp-section mx-auto max-w-content">
+          <Breadcrumbs
+            light
+            items={[
+              { label: "Strona główna", href: "/" },
+              { label: "Kontakt", href: "/kontakt" },
+            ]}
+          />
+          <span className="section-label-dash" style={{ color: "var(--gold)", marginTop: "1rem", display: "inline-flex" }}>
+            Skontaktuj się z nami
+          </span>
+          <h1
+            style={{
+              marginTop: "0.5rem",
+              fontFamily: "var(--font-heading, 'Montserrat', sans-serif)",
+              color: "var(--white)",
+              fontSize: "clamp(1.8rem, 4vw, 3rem)",
+              fontWeight: 800,
+            }}
+          >
+            Bezpłatna wycena w 24&nbsp;h
+          </h1>
+          <p style={{ marginTop: "0.75rem", color: "rgba(255,255,255,0.6)", maxWidth: "38rem", lineHeight: 1.72 }}>
+            Masz pytanie o budowę domu, remont lub współpracę? Napisz lub zadzwoń — wycena jest bezpłatna i niezobowiązująca.
+          </p>
+        </div>
+      </div>
 
-      <section className="mt-10" aria-labelledby="contact-info">
-        <h2 id="contact-info" className="text-xl font-semibold text-charcoal">
-          Dane kontaktowe
-        </h2>
-        <address className="mt-4 not-italic text-charcoal/90">
-          <p>
-            <strong>Wilk Development</strong>
-          </p>
-          <p>Usługi remontowo-budowlane</p>
-          <p className="mt-1">
-            Al. mjr. Aleja Majora Wacława Kopisto 11/193
-            <br />
-            35-315 Rzeszów
-          </p>
-          <p className="mt-2">
-            Telefon:{" "}
-            <a
-              href={`tel:${CONTACT_SNIPPET.phone.replace(/\s/g, "")}`}
-              className="text-amber hover:underline"
-            >
-              {CONTACT_SNIPPET.phone}
-            </a>
-          </p>
-          <p>
-            E-mail:{" "}
-            <a
-              href={`mailto:${CONTACT_SNIPPET.email}`}
-              className="text-amber hover:underline"
-            >
-              {CONTACT_SNIPPET.email}
-            </a>
-          </p>
-          <p className="mt-2">Godziny pracy: czynne całą dobę.</p>
-        </address>
-      </section>
+      {/* ── Main content ── */}
+      <section className="section-light" style={{ paddingBlock: "var(--section-py)" }}>
+        <div
+          className="wp-section mx-auto max-w-content grid gap-10 md:grid-cols-[2fr_3fr] md:items-start"
+        >
 
-      <section className="mt-10" aria-labelledby="form-heading">
-        <h2 id="form-heading" className="text-xl font-semibold text-charcoal">
-          Wyślij wiadomość
-        </h2>
-        <ContactForm />
+            {/* ── Left: dane kontaktowe ── */}
+            <aside>
+              {/* Karty danych */}
+              <div style={{ display: "flex", flexDirection: "column", gap: "0" }}>
+                {[
+                  {
+                    icon: Phone,
+                    label: "Telefon",
+                    value: CONTACT_SNIPPET.phone,
+                    sub: "Pon–Pt 8:00–18:00",
+                    href: `tel:${CONTACT_SNIPPET.phone.replace(/\s/g, "")}`,
+                  },
+                  {
+                    icon: Mail,
+                    label: "E-mail",
+                    value: CONTACT_SNIPPET.email,
+                    sub: "Odpowiadamy w ciągu 24h",
+                    href: `mailto:${CONTACT_SNIPPET.email}`,
+                  },
+                  {
+                    icon: MapPin,
+                    label: "Obszar działania",
+                    value: "Rzeszów i Podkarpacie",
+                    sub: "Al. mjr. W. Kopisto 11/193, 35-315 Rzeszów",
+                    href: undefined,
+                  },
+                  {
+                    icon: Clock,
+                    label: "Godziny pracy",
+                    value: "Pon – Sob",
+                    sub: "8:00 – 18:00 · Niedziela: na zlecenie",
+                    href: undefined,
+                  },
+                ].map(({ icon: Icon, label, value, sub, href }) => {
+                  const Inner = (
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "flex-start",
+                        gap: "1rem",
+                        padding: "1.5rem",
+                        borderBottom: "1px solid var(--border)",
+                        background: "var(--white)",
+                        transition: "background var(--transition)",
+                      }}
+                    >
+                      <span style={{
+                        display: "inline-flex", alignItems: "center", justifyContent: "center",
+                        width: "2.75rem", height: "2.75rem", flexShrink: 0,
+                        background: "var(--gold)", color: "var(--navy)",
+                      }}>
+                        <Icon size={17} aria-hidden />
+                      </span>
+                      <div>
+                        <p style={{ fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--slate)" }}>
+                          {label}
+                        </p>
+                        <p style={{
+                          fontFamily: "var(--font-heading, 'Montserrat', sans-serif)",
+                          fontWeight: 700, fontSize: "0.9375rem", color: "var(--charcoal)", marginTop: "0.2rem",
+                        }}>
+                          {value}
+                        </p>
+                        <p style={{ fontSize: "0.8125rem", color: "var(--slate)", marginTop: "0.15rem" }}>
+                          {sub}
+                        </p>
+                      </div>
+                    </div>
+                  );
+
+                  return href ? (
+                    <a key={label} href={href} style={{ textDecoration: "none", display: "block" }} className="hover:bg-gold-muted">
+                      {Inner}
+                    </a>
+                  ) : (
+                    <div key={label}>{Inner}</div>
+                  );
+                })}
+              </div>
+
+              {/* CTA boczne */}
+              <div
+                style={{
+                  marginTop: "2rem",
+                  background: "var(--navy)",
+                  padding: "2rem",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "1rem",
+                }}
+              >
+                <p style={{
+                  fontFamily: "var(--font-heading, 'Montserrat', sans-serif)",
+                  fontWeight: 700, fontSize: "1rem", color: "var(--white)",
+                }}>
+                  Wolisz zadzwonić?
+                </p>
+                <p style={{ fontSize: "0.875rem", color: "rgba(255,255,255,0.6)", lineHeight: 1.65 }}>
+                  Nasz specjalista odpowie na wszystkie pytania i przygotuje wstępną wycenę telefonicznie.
+                </p>
+                <a
+                  href={`tel:${CONTACT_SNIPPET.phone.replace(/\s/g, "")}`}
+                  className="wp-btn-primary"
+                  style={{ justifyContent: "center" }}
+                >
+                  <Phone size={15} aria-hidden /> {CONTACT_SNIPPET.phone}
+                </a>
+              </div>
+            </aside>
+
+            {/* ── Right: formularz ── */}
+            <div
+              style={{
+                background: "var(--white)",
+                border: "1px solid var(--border)",
+                padding: "clamp(1.5rem, 4vw, 2.5rem)",
+                boxShadow: "var(--shadow-md)",
+              }}
+            >
+              <h2
+                style={{
+                  fontFamily: "var(--font-heading, 'Montserrat', sans-serif)",
+                  fontSize: "clamp(1.25rem, 2.5vw, 1.6rem)",
+                  fontWeight: 800,
+                  color: "var(--charcoal)",
+                  marginBottom: "0.5rem",
+                }}
+              >
+                Wyślij zapytanie
+              </h2>
+              <p style={{ fontSize: "0.875rem", color: "var(--slate)", marginBottom: "1.75rem", lineHeight: 1.6 }}>
+                Opisz swoje potrzeby — odpowiemy w ciągu 24h z bezpłatną wyceną.
+              </p>
+              <ContactForm />
+            </div>
+
+        </div>
       </section>
-    </div>
+    </>
   );
 }
