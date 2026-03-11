@@ -11,6 +11,10 @@ const config = {
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "images.unsplash.com", pathname: "/**" },
+      // Vercel Blob Storage — obrazki projektu
+      { protocol: "https", hostname: "*.public.blob.vercel-storage.com", pathname: "/**" },
+      // Supabase Storage
+      { protocol: "https", hostname: "xohdpqbaoxennpgtybzk.supabase.co", pathname: "/storage/v1/object/public/**" },
     ],
     // Prefer AVIF (smallest), fallback to WebP
     formats: ["image/avif", "image/webp"],

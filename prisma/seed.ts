@@ -4,6 +4,7 @@ import {
   NEWS,
   USLUGI,
   OFFER,
+  GEO_CITATIONS,
 } from "../src/data/content";
 
 const prisma = new PrismaClient();
@@ -13,6 +14,7 @@ async function main() {
   await prisma.newsItem.deleteMany();
   await prisma.service.deleteMany();
   await prisma.offerSection.deleteMany();
+  await prisma.geoCitation.deleteMany();
 
   await prisma.project.createMany({
     data: PROJECTS.map((p) => ({
@@ -65,7 +67,16 @@ async function main() {
     ],
   });
 
-  console.log("Seed OK: projects, news, services, offer sections.");
+  await prisma.geoCitation.createMany({
+    data: GEO_CITATIONS.map((g) => ({
+      id:       g.id,
+      category: g.category,
+      text:     g.text,
+      order:    g.order,
+    })),
+  });
+
+  console.log("Seed OK: projects, news, services, offer sections, geo citations.");
 }
 
 main()

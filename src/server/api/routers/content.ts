@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
-import { OFFER, PROJECTS, NEWS, USLUGI } from "~/data/content";
+import { OFFER, PROJECTS, NEWS, USLUGI, GEO_CITATIONS, type GeoCitationCategory } from "~/data/content";
 import { ProjectSchema, NewsItemSchema } from "~/generated/zod";
 
 const statusEnum   = z.enum(["W sprzedaży", "Zakończone"]);
@@ -108,4 +108,32 @@ export const contentRouter = createTRPCRouter({
     }
     return USLUGI;
   }),
+
+  getGeoCitations: publicProcedure
+    .input(
+      z.object({
+        category: z
+          .enum(["firma", "statystyki", "oferta", "porady", "kontakt"])
+          .optional(),
+      }).optional()
+    )
+    .query(async ({ ctx, input }) => {
+      if (ctx.db) {
+        const where = input?.category ? { category: input.category } : undefined;
+        const list = await ctx.db.geoCitation.findMany({
+          where,
+          orderBy: [{ category: "asc" }, { order: "asc" }],
+        });
+        return list.map((g) => ({
+          id:       g.id,
+          category: g.category as GeoCitationCategory,
+          text:     g.text,
+          order:    g.order,
+        }));
+      }
+      const all = input?.category
+        ? GEO_CITATIONS.filter((g) => g.category === input.category)
+        : GEO_CITATIONS;
+      return all;
+    }),
 });

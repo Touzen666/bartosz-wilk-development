@@ -1,60 +1,120 @@
-// Wilk Development — schemat na przyszłe przejście z content.ts na bazę.
-// Obecnie aplikacja korzysta z src/data/content.ts; po ustawieniu DATABASE_URL
-// i uruchomieniu migracji + seed możesz przełączyć na Prisma (patrz README / env).
+// ============================================================
+// Wilk Development — schemat bazy danych (Prisma + PostgreSQL / Supabase)
+// ============================================================
+// Dane źródłowe: src/data/content.ts
+// Po konfiguracji .env uruchom:
+//   npm run db:push   → synchronizacja schematu z bazą
+//   npm run db:seed   → wgranie danych początkowych
+//   npm run db:studio → panel graficzny http://localhost:5555
+// Dokumentacja: prisma/README.md
+// ============================================================
 
 generator client {
   provider = "prisma-client-js"
 }
 
 generator zod {
-  provider                         = "zod-prisma-types"
-  output                           = "../src/generated/zod"
-  createInputTypes                 = false
-  addIncludeType                   = false
-  addSelectType                    = false
+  provider         = "zod-prisma-types"
+  output           = "../src/generated/zod"
+  createInputTypes = false
+  addIncludeType   = false
+  addSelectType    = false
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("POSTGRES_PRISMA_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
 }
 
+// ─── Project — Projekty ──────────────────────────────────────────────────────
+// Projekty budowlane firmy widoczne w galerii na stronie.
 model Project {
+  /// Unikalny identyfikator (np. "proj-001")
   id          String   @id
+  /// Nazwa projektu wyświetlana na karcie
   title       String
-  category    String   // "domy-szeregowe" | "remonty"
+  /// Kategoria: "domy-szeregowe" | "remonty"
+  category    String
+  /// Opis projektu widoczny po rozwinięciu karty
   description String
+  /// Ścieżka do zdjęcia głównego (relatywna, np. "/images/proj-001.jpg")
   imageUrl    String
-  status      String   // "W sprzedaży" | "Zakończone"
+  /// Status realizacji: "W sprzedaży" | "Zakończone"
+  status      String
+  /// Data dodania rekordu (ustawiana automatycznie)
   createdAt   DateTime @default(now())
+  /// Data ostatniej modyfikacji (aktualizowana automatycznie)
   updatedAt   DateTime @updatedAt
 }
 
+// ─── NewsItem — Aktualności ───────────────────────────────────────────────────
+// Artykuły i aktualności publikowane w sekcji "Aktualności" na stronie.
 model NewsItem {
+  /// Unikalny identyfikator (np. "news-001")
   id        String   @id
+  /// Tytuł artykułu
   title     String
+  /// Krótki opis (zajawka) wyświetlany na liście aktualności
   excerpt   String
+  /// Pełna treść artykułu (może zawierać HTML lub Markdown)
   body      String
-  date      String   // ISO date
+  /// Data publikacji w formacie ISO (np. "2024-03-01")
+  date      String
+  /// Ścieżka do zdjęcia artykułu (relatywna)
   imageUrl  String
+  /// Data dodania rekordu (ustawiana automatycznie)
   createdAt DateTime @default(now())
+  /// Data ostatniej modyfikacji (aktualizowana automatycznie)
   updatedAt DateTime @updatedAt
 }
 
+// ─── Service — Usługi ────────────────────────────────────────────────────────
+// Lista usług świadczonych przez firmę (wyświetlana na stronie głównej).
 model Service {
+  /// Unikalny identyfikator (np. "s-0")
   id    String @id
+  /// Nazwa usługi wyświetlana na stronie
   name  String
+  /// Kolejność wyświetlania na liście (rosnąco, domyślnie 0)
   order Int    @default(0)
 }
 
-// Sekcje oferty (domy szeregowe, remonty pod klucz)
+// ─── GeoCitation — Zdania GEO/AI-citation ────────────────────────────────────
+// Krótkie zdania cytowane przez modele AI (Gemini, ChatGPT, Perplexity, AI Overviews).
+// Kategorie: "firma" | "statystyki" | "oferta" | "porady" | "kontakt"
+model GeoCitation {
+  /// Unikalny identyfikator (np. "geo-001")
+  id        String   @id
+  /// Kategoria tematyczna zdania
+  category  String
+  /// Treść zdania zoptymalizowanego pod cytowanie przez AI
+  text      String
+  /// Kolejność wyświetlania w ramach kategorii (rosnąco)
+  order     Int      @default(0)
+  /// Data dodania rekordu (ustawiana automatycznie)
+  createdAt DateTime @default(now())
+  /// Data ostatniej modyfikacji (aktualizowana automatycznie)
+  updatedAt DateTime @updatedAt
+}
+
+// ─── OfferSection — Sekcje oferty ────────────────────────────────────────────
+// Sekcje strony oferty: "Domy Szeregowe" i "Remonty pod klucz".
 model OfferSection {
+  /// Unikalny identyfikator (np. "offer-domy")
   id          String   @id
-  slug        String   @unique // np. "domy-szeregowe", "remonty-pod-klucz"
+  /// Identyfikator w URL (np. "domy-szeregowe", "remonty-pod-klucz") — musi być unikalny
+  slug        String   @unique
+  /// Nagłówek sekcji oferty
   title       String
+  /// Podtytuł sekcji oferty
   subtitle    String
+  /// Pełny opis oferty
   description String
-  highlights  String   // JSON array of strings
+  /// Lista punktów kluczowych oferty (przechowywana jako JSON, np. ["Punkt 1","Punkt 2"])
+  highlights  String
+  /// Data dodania rekordu (ustawiana automatycznie)
   createdAt   DateTime @default(now())
+  /// Data ostatniej modyfikacji (aktualizowana automatycznie)
   updatedAt   DateTime @updatedAt
 }

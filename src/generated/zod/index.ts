@@ -10,7 +10,7 @@ import type { Prisma } from '@prisma/client';
 // ENUMS
 /////////////////////////////////////////
 
-export const TransactionIsolationLevelSchema = z.enum(['Serializable']);
+export const TransactionIsolationLevelSchema = z.enum(['ReadUncommitted','ReadCommitted','RepeatableRead','Serializable']);
 
 export const ProjectScalarFieldEnumSchema = z.enum(['id','title','category','description','imageUrl','status','createdAt','updatedAt']);
 
@@ -18,9 +18,13 @@ export const NewsItemScalarFieldEnumSchema = z.enum(['id','title','excerpt','bod
 
 export const ServiceScalarFieldEnumSchema = z.enum(['id','name','order']);
 
+export const GeoCitationScalarFieldEnumSchema = z.enum(['id','category','text','order','createdAt','updatedAt']);
+
 export const OfferSectionScalarFieldEnumSchema = z.enum(['id','slug','title','subtitle','description','highlights','createdAt','updatedAt']);
 
 export const SortOrderSchema = z.enum(['asc','desc']);
+
+export const QueryModeSchema = z.enum(['default','insensitive']);
 /////////////////////////////////////////
 // MODELS
 /////////////////////////////////////////
@@ -30,13 +34,37 @@ export const SortOrderSchema = z.enum(['asc','desc']);
 /////////////////////////////////////////
 
 export const ProjectSchema = z.object({
+  /**
+   * Unikalny identyfikator (np. "proj-001")
+   */
   id: z.string(),
+  /**
+   * Nazwa projektu wyświetlana na karcie
+   */
   title: z.string(),
+  /**
+   * Kategoria: "domy-szeregowe" | "remonty"
+   */
   category: z.string(),
+  /**
+   * Opis projektu widoczny po rozwinięciu karty
+   */
   description: z.string(),
+  /**
+   * Ścieżka do zdjęcia głównego (relatywna, np. "/images/proj-001.jpg")
+   */
   imageUrl: z.string(),
+  /**
+   * Status realizacji: "W sprzedaży" | "Zakończone"
+   */
   status: z.string(),
+  /**
+   * Data dodania rekordu (ustawiana automatycznie)
+   */
   createdAt: z.coerce.date(),
+  /**
+   * Data ostatniej modyfikacji (aktualizowana automatycznie)
+   */
   updatedAt: z.coerce.date(),
 })
 
@@ -47,13 +75,37 @@ export type Project = z.infer<typeof ProjectSchema>
 /////////////////////////////////////////
 
 export const NewsItemSchema = z.object({
+  /**
+   * Unikalny identyfikator (np. "news-001")
+   */
   id: z.string(),
+  /**
+   * Tytuł artykułu
+   */
   title: z.string(),
+  /**
+   * Krótki opis (zajawka) wyświetlany na liście aktualności
+   */
   excerpt: z.string(),
+  /**
+   * Pełna treść artykułu (może zawierać HTML lub Markdown)
+   */
   body: z.string(),
+  /**
+   * Data publikacji w formacie ISO (np. "2024-03-01")
+   */
   date: z.string(),
+  /**
+   * Ścieżka do zdjęcia artykułu (relatywna)
+   */
   imageUrl: z.string(),
+  /**
+   * Data dodania rekordu (ustawiana automatycznie)
+   */
   createdAt: z.coerce.date(),
+  /**
+   * Data ostatniej modyfikacji (aktualizowana automatycznie)
+   */
   updatedAt: z.coerce.date(),
 })
 
@@ -64,25 +116,91 @@ export type NewsItem = z.infer<typeof NewsItemSchema>
 /////////////////////////////////////////
 
 export const ServiceSchema = z.object({
+  /**
+   * Unikalny identyfikator (np. "s-0")
+   */
   id: z.string(),
+  /**
+   * Nazwa usługi wyświetlana na stronie
+   */
   name: z.string(),
+  /**
+   * Kolejność wyświetlania na liście (rosnąco, domyślnie 0)
+   */
   order: z.number().int(),
 })
 
 export type Service = z.infer<typeof ServiceSchema>
 
 /////////////////////////////////////////
+// GEO CITATION SCHEMA
+/////////////////////////////////////////
+
+export const GeoCitationSchema = z.object({
+  /**
+   * Unikalny identyfikator (np. "geo-001")
+   */
+  id: z.string(),
+  /**
+   * Kategoria tematyczna zdania
+   */
+  category: z.string(),
+  /**
+   * Treść zdania zoptymalizowanego pod cytowanie przez AI
+   */
+  text: z.string(),
+  /**
+   * Kolejność wyświetlania w ramach kategorii (rosnąco)
+   */
+  order: z.number().int(),
+  /**
+   * Data dodania rekordu (ustawiana automatycznie)
+   */
+  createdAt: z.coerce.date(),
+  /**
+   * Data ostatniej modyfikacji (aktualizowana automatycznie)
+   */
+  updatedAt: z.coerce.date(),
+})
+
+export type GeoCitation = z.infer<typeof GeoCitationSchema>
+
+/////////////////////////////////////////
 // OFFER SECTION SCHEMA
 /////////////////////////////////////////
 
 export const OfferSectionSchema = z.object({
+  /**
+   * Unikalny identyfikator (np. "offer-domy")
+   */
   id: z.string(),
+  /**
+   * Identyfikator w URL (np. "domy-szeregowe", "remonty-pod-klucz") — musi być unikalny
+   */
   slug: z.string(),
+  /**
+   * Nagłówek sekcji oferty
+   */
   title: z.string(),
+  /**
+   * Podtytuł sekcji oferty
+   */
   subtitle: z.string(),
+  /**
+   * Pełny opis oferty
+   */
   description: z.string(),
+  /**
+   * Lista punktów kluczowych oferty (przechowywana jako JSON, np. ["Punkt 1","Punkt 2"])
+   */
   highlights: z.string(),
+  /**
+   * Data dodania rekordu (ustawiana automatycznie)
+   */
   createdAt: z.coerce.date(),
+  /**
+   * Data ostatniej modyfikacji (aktualizowana automatycznie)
+   */
   updatedAt: z.coerce.date(),
 })
 
