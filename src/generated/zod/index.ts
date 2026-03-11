@@ -26,6 +26,14 @@ export const SessionScalarFieldEnumSchema = z.enum(['id','sessionToken','userId'
 
 export const VerificationTokenScalarFieldEnumSchema = z.enum(['identifier','token','expires']);
 
+export const SiteConfigScalarFieldEnumSchema = z.enum(['key','value','updatedAt']);
+
+export const FaqItemScalarFieldEnumSchema = z.enum(['id','question','answer','order','createdAt','updatedAt']);
+
+export const ServiceCardScalarFieldEnumSchema = z.enum(['id','title','description','imageUrl','iconName','order','createdAt','updatedAt']);
+
+export const WhyUsItemScalarFieldEnumSchema = z.enum(['id','title','description','order','createdAt','updatedAt']);
+
 export const GeoCitationScalarFieldEnumSchema = z.enum(['id','category','text','order','createdAt','updatedAt']);
 
 export const OfferSectionScalarFieldEnumSchema = z.enum(['id','slug','title','subtitle','description','highlights','createdAt','updatedAt']);
@@ -213,6 +221,68 @@ export const VerificationTokenSchema = z.object({
 })
 
 export type VerificationToken = z.infer<typeof VerificationTokenSchema>
+
+/////////////////////////////////////////
+// SITE CONFIG SCHEMA
+/////////////////////////////////////////
+
+export const SiteConfigSchema = z.object({
+  key: z.string(),
+  value: z.string(),
+  updatedAt: z.coerce.date(),
+})
+
+export type SiteConfig = z.infer<typeof SiteConfigSchema>
+
+/////////////////////////////////////////
+// FAQ ITEM SCHEMA
+/////////////////////////////////////////
+
+export const FaqItemSchema = z.object({
+  id: z.string().cuid(),
+  question: z.string(),
+  answer: z.string(),
+  order: z.number().int(),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
+})
+
+export type FaqItem = z.infer<typeof FaqItemSchema>
+
+/////////////////////////////////////////
+// SERVICE CARD SCHEMA
+/////////////////////////////////////////
+
+export const ServiceCardSchema = z.object({
+  id: z.string().cuid(),
+  title: z.string(),
+  description: z.string(),
+  imageUrl: z.string(),
+  /**
+   * Nazwa ikony z lucide-react (np. "Building2", "Paintbrush")
+   */
+  iconName: z.string(),
+  order: z.number().int(),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
+})
+
+export type ServiceCard = z.infer<typeof ServiceCardSchema>
+
+/////////////////////////////////////////
+// WHY US ITEM SCHEMA
+/////////////////////////////////////////
+
+export const WhyUsItemSchema = z.object({
+  id: z.string().cuid(),
+  title: z.string(),
+  description: z.string(),
+  order: z.number().int(),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
+})
+
+export type WhyUsItem = z.infer<typeof WhyUsItemSchema>
 
 /////////////////////////////////////////
 // GEO CITATION SCHEMA

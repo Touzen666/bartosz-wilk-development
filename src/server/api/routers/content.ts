@@ -3,6 +3,22 @@ import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { OFFER, PROJECTS, NEWS, USLUGI, GEO_CITATIONS, type GeoCitationCategory } from "~/data/content";
 import { ProjectSchema, NewsItemSchema } from "~/generated/zod";
 
+// Fallbacki statyczne dla SiteConfig gdy baza niedostępna
+const SITE_CONFIG_FALLBACK: Record<string, string> = {
+  about_intro: "Wilk Development to rzeszowska firma budowlano-remontowa z ponad 15-letnim doświadczeniem.",
+  contact_phone: "+48 690 884 961", contact_email: "biuro@zlotewynajmy.com", contact_address: "Rzeszów, Podkarpacie",
+  geo_years_on_market: "15", geo_bathroom_days: "14", geo_terrace_weeks: "2–4",
+  geo_certification_norm: "PN-EN", geo_completed_projects: "setki",
+  hero_image_main: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1600&q=80&auto=format&fit=crop",
+  hero_image_terraced: "https://images.unsplash.com/photo-1507089947368-19c1da9775ae?w=1600&q=80&auto=format&fit=crop",
+  hero_image_renovation: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=1600&q=80&auto=format&fit=crop",
+  hero_tagline: "Rzeszów · Podkarpacie · od 2010 roku",
+  hero_heading: "Budujemy i remontujemy pod klucz",
+  hero_description: "Wilk Development — domy szeregowe, remonty mieszkań i wykończenia wnętrz. Jedna firma, pełna realizacja, terminowość gwarantowana.",
+  offer_psr_domy_result: "Inwestor otrzymuje gotowy, energooszczędny dom z pisemną gwarancją, w ustalonym terminie, z jednym punktem kontaktu przez cały czas budowy.",
+  offer_psr_remonty_result: "Średni czas remontu łazienki to 14 dni roboczych. Jedna umowa, jedna faktura, pełna odpowiedzialność i gwarancja pisemna na wykonane prace.",
+};
+
 const statusEnum   = z.enum(["W sprzedaży", "Zakończone"]);
 const categoryEnum = z.enum(["domy-szeregowe", "remonty"]);
 
@@ -107,6 +123,39 @@ export const contentRouter = createTRPCRouter({
       return list.map((s) => s.name);
     }
     return USLUGI;
+  }),
+
+  // ─── SiteConfig ────────────────────────────────────────────────────────────
+  getSiteConfig: publicProcedure.query(async ({ ctx }) => {
+    if (ctx.db) {
+      const rows = await ctx.db.siteConfig.findMany();
+      return Object.fromEntries(rows.map((r) => [r.key, r.value])) as Record<string, string>;
+    }
+    return SITE_CONFIG_FALLBACK;
+  }),
+
+  // ─── FaqItems ────────────────────────────────────────────────────────────
+  getFaqItems: publicProcedure.query(async ({ ctx }) => {
+    if (ctx.db) {
+      return ctx.db.faqItem.findMany({ orderBy: { order: "asc" } });
+    }
+    return [];
+  }),
+
+  // ─── ServiceCards ────────────────────────────────────────────────────────
+  getServiceCards: publicProcedure.query(async ({ ctx }) => {
+    if (ctx.db) {
+      return ctx.db.serviceCard.findMany({ orderBy: { order: "asc" } });
+    }
+    return [];
+  }),
+
+  // ─── WhyUsItems ──────────────────────────────────────────────────────────
+  getWhyUsItems: publicProcedure.query(async ({ ctx }) => {
+    if (ctx.db) {
+      return ctx.db.whyUsItem.findMany({ orderBy: { order: "asc" } });
+    }
+    return [];
   }),
 
   getGeoCitations: publicProcedure

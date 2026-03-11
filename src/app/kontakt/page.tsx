@@ -3,8 +3,8 @@ import Link from "next/link";
 import { Phone, Mail, MapPin, Clock, ArrowRight } from "lucide-react";
 import { ContactForm } from "~/components/ContactForm";
 import { canonical } from "~/lib/seo";
-import { CONTACT_SNIPPET } from "~/data/content";
 import { Breadcrumbs } from "~/components/Breadcrumbs";
+import { getCachedSiteConfig } from "~/lib/data-cache";
 
 export const revalidate = 86400;
 
@@ -21,7 +21,10 @@ export const metadata: Metadata = {
   },
 };
 
-export default function KontaktPage() {
+export default async function KontaktPage() {
+  const cfg = await getCachedSiteConfig();
+  const phone = cfg.contact_phone ?? "+48 690 884 961";
+  const email = cfg.contact_email ?? "biuro@zlotewynajmy.com";
   return (
     <>
       {/* ── Hero bar ── */}
@@ -68,16 +71,16 @@ export default function KontaktPage() {
                   {
                     icon: Phone,
                     label: "Telefon",
-                    value: CONTACT_SNIPPET.phone,
+                    value: phone,
                     sub: "Pon–Pt 8:00–18:00",
-                    href: `tel:${CONTACT_SNIPPET.phone.replace(/\s/g, "")}`,
+                    href: `tel:${phone.replace(/\s/g, "")}`,
                   },
                   {
                     icon: Mail,
                     label: "E-mail",
-                    value: CONTACT_SNIPPET.email,
+                    value: email,
                     sub: "Odpowiadamy w ciągu 24h",
-                    href: `mailto:${CONTACT_SNIPPET.email}`,
+                    href: `mailto:${email}`,
                   },
                   {
                     icon: MapPin,
@@ -161,11 +164,11 @@ export default function KontaktPage() {
                   Nasz specjalista odpowie na wszystkie pytania i przygotuje wstępną wycenę telefonicznie.
                 </p>
                 <a
-                  href={`tel:${CONTACT_SNIPPET.phone.replace(/\s/g, "")}`}
+                  href={`tel:${phone.replace(/\s/g, "")}`}
                   className="wp-btn-primary"
                   style={{ justifyContent: "center" }}
                 >
-                  <Phone size={15} aria-hidden /> {CONTACT_SNIPPET.phone}
+                  <Phone size={15} aria-hidden /> {phone}
                 </a>
               </div>
             </aside>

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Phone, Mail, MapPin } from "lucide-react";
-import { CONTACT_SNIPPET } from "~/data/content";
 import { LOCAL_NAV } from "~/lib/seo";
+import { getCachedSiteConfig } from "~/lib/data-cache";
 
 const footerNav = [
   { href: "/uslugi", label: "Wszystkie usługi" },
@@ -14,7 +14,10 @@ const footerNav = [
 
 const localLinks = LOCAL_NAV;
 
-export function Footer() {
+export async function Footer() {
+  const cfg = await getCachedSiteConfig();
+  const phone   = cfg.contact_phone   ?? "+48 690 884 961";
+  const email   = cfg.contact_email   ?? "biuro@zlotewynajmy.com";
   const year = new Date().getFullYear();
   return (
     <footer
@@ -66,7 +69,7 @@ export function Footer() {
             </p>
             <div style={{ marginTop: "1.25rem", display: "flex", flexDirection: "column", gap: "0.55rem" }}>
               <a
-                href={`tel:${CONTACT_SNIPPET.phone.replace(/\s/g, "")}`}
+                href={`tel:${phone.replace(/\s/g, "")}`}
                 style={{
                   display: "inline-flex", alignItems: "center", gap: "0.6rem",
                   fontSize: "0.9rem", color: "var(--gold)", fontWeight: 600,
@@ -74,10 +77,10 @@ export function Footer() {
                 }}
                 className="hover:opacity-80"
               >
-                <Phone size={15} aria-hidden /> {CONTACT_SNIPPET.phone}
+                <Phone size={15} aria-hidden /> {phone}
               </a>
               <a
-                href={`mailto:${CONTACT_SNIPPET.email}`}
+                href={`mailto:${email}`}
                 style={{
                   display: "inline-flex", alignItems: "center", gap: "0.6rem",
                   fontSize: "0.9rem", color: "var(--gold)", fontWeight: 600,
@@ -85,7 +88,7 @@ export function Footer() {
                 }}
                 className="hover:opacity-80"
               >
-                <Mail size={15} aria-hidden /> {CONTACT_SNIPPET.email}
+                <Mail size={15} aria-hidden /> {email}
               </a>
               <span
                 style={{

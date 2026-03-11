@@ -55,7 +55,7 @@ const _getCachedNews = unstable_cache(
   async (limit?: number) => {
     const caller = await createCaller();
     return caller.content.getNews(limit ? { limit } : undefined) as Promise<NewsItem[]>;
-  },
+   },
   ["news"],
   { revalidate: TTL_NEWS, tags: ["news"] }
 );
@@ -97,6 +97,46 @@ const _getCachedUslugi = unstable_cache(
 export const getCachedUslugi = DEV
   ? () => createCaller().then((c) => c.content.getUslugi())
   : _getCachedUslugi;
+
+// ─── SiteConfig ──────────────────────────────────────────────────────────────
+const _getCachedSiteConfig = unstable_cache(
+  async () => { const caller = await createCaller(); return caller.content.getSiteConfig(); },
+  ["site-config"],
+  { revalidate: TTL_STANDARD, tags: ["site-config"] }
+);
+export const getCachedSiteConfig = DEV
+  ? () => createCaller().then((c) => c.content.getSiteConfig())
+  : _getCachedSiteConfig;
+
+// ─── FaqItems ────────────────────────────────────────────────────────────────
+const _getCachedFaqItems = unstable_cache(
+  async () => { const caller = await createCaller(); return caller.content.getFaqItems(); },
+  ["faq-items"],
+  { revalidate: TTL_STANDARD, tags: ["faq-items"] }
+);
+export const getCachedFaqItems = DEV
+  ? () => createCaller().then((c) => c.content.getFaqItems())
+  : _getCachedFaqItems;
+
+// ─── ServiceCards ─────────────────────────────────────────────────────────────
+const _getCachedServiceCards = unstable_cache(
+  async () => { const caller = await createCaller(); return caller.content.getServiceCards(); },
+  ["service-cards"],
+  { revalidate: TTL_STANDARD, tags: ["service-cards"] }
+);
+export const getCachedServiceCards = DEV
+  ? () => createCaller().then((c) => c.content.getServiceCards())
+  : _getCachedServiceCards;
+
+// ─── WhyUsItems ───────────────────────────────────────────────────────────────
+const _getCachedWhyUsItems = unstable_cache(
+  async () => { const caller = await createCaller(); return caller.content.getWhyUsItems(); },
+  ["why-us-items"],
+  { revalidate: TTL_STANDARD, tags: ["why-us-items"] }
+);
+export const getCachedWhyUsItems = DEV
+  ? () => createCaller().then((c) => c.content.getWhyUsItems())
+  : _getCachedWhyUsItems;
 
 // ─── Geo Citations ────────────────────────────────────────────────────────────
 type GeoCitationCategory = "firma" | "statystyki" | "oferta" | "porady" | "kontakt";

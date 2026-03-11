@@ -1,5 +1,6 @@
 import NextAuth, { type DefaultSession } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
+import { PrismaAdapter } from "@auth/prisma-adapter";
 import bcrypt from "bcryptjs";
 import { db } from "~/server/db";
 import type { Role } from "@prisma/client";
@@ -17,11 +18,14 @@ declare module "next-auth" {
   }
 }
 
-// ─── NextAuth config — JWT + Credentials ──────────────────────────────────────
-// Przy JWT (stateless) adapter bazodanowy nie jest potrzebny.
-// Adapter dodamy gdy będziemy integrować zewnętrznych providerów OAuth (Google, GitHub).
+// ─── NextAuth config — Prisma adapter + sesje bazodanowe ─────────────────────
+// strategy: "database" — każde logowanie tworzy wiersz w tabeli Session.
+// Wylogowanie / wygaśnięcie usuwa ten wiersz, dzięki czemu możemy centralnie
+// zarządzać aktywnymi sesjami (podgląd, wymuszenie wylogowania z admina itp.).
 export const { handlers, signIn, signOut, auth } = NextAuth({
-  session: { strategy: "jwt" },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  adapter: PrismaAdapter(db) as any,
+  session: { strategy: "database" },
 
   providers: [
     Credentials({
@@ -41,7 +45,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
         const passwordValid = await bcrypt.compare(
           String(credentials.password),
-          user.password
+          user.password,
         );
 
         if (!passwordValid) return null;
@@ -51,26 +55,21 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           email: user.email,
           name:  user.name,
           role:  user.role,
+          image: user.image,
         };
       },
     }),
-    // Tutaj dołącz kolejnych providerów OAuth, np.:
+    // Tutaj dołącz providerów OAuth, np.:
     // Google({ clientId: process.env.GOOGLE_CLIENT_ID!, clientSecret: process.env.GOOGLE_CLIENT_SECRET! })
   ],
 
   callbacks: {
-    // Przy logowaniu wstrzykuje id i rolę do JWT
-    jwt({ token, user }) {
+    // Z strategy: "database" callback session dostaje `user` (z DB) zamiast `token`
+    session({ session, user }) {
       if (user) {
-        token.id   = user.id as string;
-        token.role = user.role as Role;
+        session.user.id   = user.id;
+        session.user.role = (user as { role: Role }).role;
       }
-      return token;
-    },
-    // Przekazuje id i rolę z JWT do obiektu sesji widocznego po stronie klienta
-    session({ session, token }) {
-      session.user.id   = token.id as string;
-      session.user.role = token.role as Role;
       return session;
     },
   },

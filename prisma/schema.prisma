@@ -139,6 +139,47 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
+// ─── SiteConfig — Konfiguracja strony (klucz → wartość) ─────────────────────
+// Przykładowe klucze: about_intro, contact_phone, hero_image_main, geo_years…
+model SiteConfig {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}
+
+// ─── FaqItem — Pytania i odpowiedzi FAQ ───────────────────────────────────────
+model FaqItem {
+  id        String   @id @default(cuid())
+  question  String
+  answer    String
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ─── ServiceCard — Karty usług (sekcja "Jakość usług") ───────────────────────
+model ServiceCard {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  imageUrl    String
+  /// Nazwa ikony z lucide-react (np. "Building2", "Paintbrush")
+  iconName    String
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// ─── WhyUsItem — Dlaczego Wilk Development ───────────────────────────────────
+model WhyUsItem {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
 // ─── GeoCitation — Zdania GEO/AI-citation ────────────────────────────────────
 // Krótkie zdania cytowane przez modele AI (Gemini, ChatGPT, Perplexity, AI Overviews).
 // Kategorie: "firma" | "statystyki" | "oferta" | "porady" | "kontakt"

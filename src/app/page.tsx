@@ -17,16 +17,10 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { canonical } from "~/lib/seo";
-import { getCachedOffer, getCachedProjects, getCachedUslugi } from "~/lib/data-cache";
 import {
-  ABOUT_INTRO,
-  WHY_US,
-  CONTACT_SNIPPET,
-  HERO_IMAGES,
-  GEO_STATS,
-  OFFER_PSR,
-  FAQ_ITEMS,
-} from "~/data/content";
+  getCachedOffer, getCachedProjects, getCachedUslugi,
+  getCachedSiteConfig, getCachedFaqItems, getCachedServiceCards,
+} from "~/lib/data-cache";
 import { TrendingUp, Users, Calendar, Award } from "lucide-react";
 import { GeoFaq } from "~/components/GeoFaq";
 import { GeoSpeakableSchema } from "~/components/GeoSpeakableSchema";
@@ -48,11 +42,27 @@ export const metadata: Metadata = {
 };
 
 export default async function HomePage() {
-  const [offer, projects, uslugi] = await Promise.all([
+  const [offer, projects, uslugi, cfg, faqItems, serviceCards] = await Promise.all([
     getCachedOffer(),
     getCachedProjects(),
     getCachedUslugi(),
+    getCachedSiteConfig(),
+    getCachedFaqItems(),
+    getCachedServiceCards(),
   ]);
+
+  // Skróty dla wygody
+  const heroTagline     = cfg.hero_tagline     ?? "Rzeszów · Podkarpacie · od 2010 roku";
+  const heroHeading     = cfg.hero_heading     ?? "Budujemy i remontujemy pod klucz";
+  const heroDescription = cfg.hero_description ?? "";
+  const heroImageMain   = cfg.hero_image_main  ?? "";
+  const aboutIntro      = cfg.about_intro      ?? "";
+  const yearsOnMarket   = cfg.geo_years_on_market    ?? "15";
+  const completedProjects = cfg.geo_completed_projects ?? "setki";
+  const psrDomyResult     = cfg.offer_psr_domy_result    ?? "";
+  const psrRemontyResult  = cfg.offer_psr_remonty_result ?? "";
+  const contactPhone    = cfg.contact_phone   ?? "";
+  const contactEmail    = cfg.contact_email   ?? "";;
 
   return (
     <>
@@ -67,7 +77,7 @@ export default async function HomePage() {
         aria-labelledby="hero-heading"
       >
         <Image
-          src={HERO_IMAGES.main}
+          src={heroImageMain}
           alt="Nowoczesne osiedle domów szeregowych w wieczornym świetle"
           fill
           priority
@@ -91,7 +101,7 @@ export default async function HomePage() {
         >
           <div style={{ maxWidth: "44rem" }}>
             <span className="section-label-dash" style={{ color: "var(--gold)" }}>
-              Rzeszów · Podkarpacie · od 2010 roku
+              {heroTagline}
             </span>
             <h1
               id="hero-heading"
@@ -105,8 +115,7 @@ export default async function HomePage() {
                 marginTop: "0.5rem",
               }}
             >
-              Budujemy i remontujemy{" "}
-              <span style={{ color: "var(--gold)" }}>pod klucz</span>
+              {heroHeading}
             </h1>
             <p
               style={{
@@ -117,7 +126,7 @@ export default async function HomePage() {
                 maxWidth: "36rem",
               }}
             >
-              Wilk Development — domy szeregowe, remonty mieszkań i wykończenia wnętrz. Jedna firma, pełna realizacja, terminowość gwarantowana.
+              {heroDescription}
             </p>
             <div style={{ display: "flex", flexWrap: "wrap", gap: "0.875rem", marginTop: "2.5rem" }}>
               <Link href="/kontakt" className="wp-btn-primary">
@@ -151,10 +160,10 @@ export default async function HomePage() {
                 lineHeight: 1.2,
               }}
             >
-              {GEO_STATS.yearsOnMarket}+ lat<br />nieprzerwanego sukcesu
+              {yearsOnMarket}+ lat<br />nieprzerwanego sukcesu
             </h2>
             <p style={{ fontSize: "0.9375rem", color: "rgba(10,18,30,0.75)", lineHeight: 1.7 }}>
-              {ABOUT_INTRO}
+              {aboutIntro}
             </p>
             <div>
               <Link
@@ -178,8 +187,8 @@ export default async function HomePage() {
           {/* Right: 2x2 stats grid */}
           <div className="stats-split-right">
             {[
-              { icon: TrendingUp, value: `${GEO_STATS.completedProjects}+`, label: "Zrealizowanych projektów" },
-              { icon: Calendar,   value: `${GEO_STATS.yearsOnMarket}+`,     label: "Lat na rynku budowlanym" },
+              { icon: TrendingUp, value: `${completedProjects}+`, label: "Zrealizowanych projektów" },
+              { icon: Calendar,   value: `${yearsOnMarket}+`,     label: "Lat na rynku budowlanym" },
               { icon: Users,      value: "1 kontakt",                        label: "Jedna firma, pełna obsługa" },
               { icon: Award,      value: "100%",                             label: "Certyfikowane materiały" },
             ].map(({ icon: Icon, value, label }) => (
@@ -221,45 +230,45 @@ export default async function HomePage() {
               listStyle: "none",
             }}
           >
-            {[
-              { icon: Building2,   title: "Budowa domów",        desc: "Domy szeregowe i jednorodzinne od fundamentów po klucze.",        img: "https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=600&q=80&auto=format&fit=crop" },
-              { icon: Paintbrush,  title: "Wykończenia wnętrz",  desc: "Kompleksowe wykończenia i aranżacje wnętrz pod klucz.",            img: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&q=80&auto=format&fit=crop" },
-              { icon: Ruler,       title: "Budowa tarasów",      desc: "Tarasy i werandy z trwałych materiałów — projekt i wykonanie.",    img: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80&auto=format&fit=crop" },
-              { icon: Lightbulb,   title: "Instalacje",          desc: "Elektryka, hydraulika i ogrzewanie — certyfikowani specjaliści.",  img: "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=600&q=80&auto=format&fit=crop" },
-              { icon: ShieldCheck, title: "Remonty mieszkań",    desc: "Pełny remont mieszkań i lokali użytkowych w Rzeszowie.",           img: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=600&q=80&auto=format&fit=crop" },
-              { icon: Layers,      title: "Układanie płytek",    desc: "Greś, gres porcelanowy, mozaika — łazienki, kuchnie, tarasy.",     img: "https://images.unsplash.com/photo-1581858726788-75bc0f6a952d?w=600&q=80&auto=format&fit=crop" },
-            ].map(({ icon: Icon, title, desc, img }) => (
-              <li key={title}>
-                <div className="spc">
-                  <div className="spc-photo">
-                    <Image
-                      src={img}
-                      alt={title}
-                      fill
-                      loading="lazy"
-                      className="object-cover"
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    />
-                  </div>
-                  <div className="spc-body">
-                    <span className="spc-icon">
-                      <Icon size={18} aria-hidden />
-                    </span>
-                    <div>
-                      <p style={{
-                        fontFamily: "var(--font-heading, 'Montserrat', sans-serif)",
-                        fontWeight: 700, fontSize: "0.9375rem", color: "var(--charcoal)",
-                      }}>
-                        {title}
-                      </p>
-                      <p style={{ marginTop: "0.3rem", fontSize: "0.8125rem", color: "var(--slate)", lineHeight: 1.6 }}>
-                        {desc}
-                      </p>
+            {serviceCards.map((card) => {
+              const iconMap: Record<string, React.ElementType> = {
+                Building2: Building2, Paintbrush: Paintbrush, Ruler: Ruler,
+                Lightbulb: Lightbulb, ShieldCheck: ShieldCheck, Layers: Layers,
+              };
+              const Icon = iconMap[card.iconName] ?? Building2;
+              return (
+                <li key={card.id}>
+                  <div className="spc">
+                    <div className="spc-photo">
+                      <Image
+                        src={card.imageUrl}
+                        alt={card.title}
+                        fill
+                        loading="lazy"
+                        className="object-cover"
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      />
+                    </div>
+                    <div className="spc-body">
+                      <span className="spc-icon">
+                        <Icon size={18} aria-hidden />
+                      </span>
+                      <div>
+                        <p style={{
+                          fontFamily: "var(--font-heading, 'Montserrat', sans-serif)",
+                          fontWeight: 700, fontSize: "0.9375rem", color: "var(--charcoal)",
+                        }}>
+                          {card.title}
+                        </p>
+                        <p style={{ marginTop: "0.3rem", fontSize: "0.8125rem", color: "var(--slate)", lineHeight: 1.6 }}>
+                          {card.description}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </li>
-            ))}
+                </li>
+              );
+            })}
           </ul>
         </div>
       </section>
@@ -302,7 +311,7 @@ export default async function HomePage() {
               </div>
 
               <p style={{ marginTop: "1.25rem", fontSize: "0.9375rem", color: "var(--charcoal-soft)", lineHeight: 1.72 }}>
-                {OFFER_PSR.domySzeregowe.result}
+                {psrDomyResult}
               </p>
 
               <ul style={{ marginTop: "1.25rem", display: "flex", flexDirection: "column", gap: "0.4rem" }}>
@@ -345,7 +354,7 @@ export default async function HomePage() {
               </div>
 
               <p style={{ marginTop: "1.25rem", fontSize: "0.9375rem", color: "var(--charcoal-soft)", lineHeight: 1.72 }}>
-                {OFFER_PSR.remontyPodKlucz.result}
+                {psrRemontyResult}
               </p>
 
               <ul style={{ marginTop: "1.25rem", display: "flex", flexDirection: "column", gap: "0.4rem" }}>
@@ -436,7 +445,7 @@ export default async function HomePage() {
             Jesteśmy najlepsi w branży
           </h2>
           <p style={{ fontSize: "0.9375rem", color: "rgba(10,18,30,0.72)", lineHeight: 1.72 }}>
-            Ponad {GEO_STATS.yearsOnMarket} lat doświadczenia w budownictwie i wykończeniach na terenie Rzeszowa i Podkarpacia. Jedna firma — pełna odpowiedzialność za projekt.
+            Ponad {yearsOnMarket} lat doświadczenia w budownictwie i wykończeniach na terenie Rzeszowa i Podkarpacia. Jedna firma — pełna odpowiedzialność za projekt.
           </p>
           <ul style={{ display: "flex", flexDirection: "column", gap: "1rem", listStyle: "none" }}>
             {[
@@ -509,7 +518,7 @@ export default async function HomePage() {
             <span className="section-label">FAQ</span>
             <h2 style={{ marginTop: "0.5rem" }}>Masz <span style={{ color: "var(--gold)" }}>pytania?</span></h2>
           </div>
-          <GeoFaq items={FAQ_ITEMS} />
+          <GeoFaq items={faqItems} />
         </div>
       </section>
 
@@ -576,7 +585,7 @@ export default async function HomePage() {
           >
             {/* Telefon */}
             <a
-              href={`tel:${CONTACT_SNIPPET.phone.replace(/\s/g, "")}`}
+              href={`tel:${contactPhone.replace(/\s/g, "")}`}
               style={{
                 display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center",
                 padding: "2.5rem 2rem",
@@ -604,7 +613,7 @@ export default async function HomePage() {
                   fontWeight: 800, fontSize: "clamp(1.1rem, 2vw, 1.35rem)",
                   color: "var(--white)", letterSpacing: "-0.01em",
                 }}>
-                  {CONTACT_SNIPPET.phone}
+                  {contactPhone}
                 </p>
                 <p style={{ fontSize: "0.8125rem", color: "rgba(255,255,255,0.45)", marginTop: "0.3rem" }}>
                   Pon–Pt 8:00–18:00
@@ -614,7 +623,7 @@ export default async function HomePage() {
 
             {/* E-mail */}
             <a
-              href={`mailto:${CONTACT_SNIPPET.email}`}
+              href={`mailto:${contactEmail}`}
               style={{
                 display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center",
                 padding: "2.5rem 2rem",
@@ -643,7 +652,7 @@ export default async function HomePage() {
                   color: "var(--navy)", letterSpacing: "-0.01em",
                   wordBreak: "break-all",
                 }}>
-                  {CONTACT_SNIPPET.email}
+                  {contactEmail}
                 </p>
                 <p style={{ fontSize: "0.8125rem", color: "rgba(10,18,30,0.55)", marginTop: "0.3rem" }}>
                   Odpowiadamy w ciągu 24h
