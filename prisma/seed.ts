@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import bcrypt from "bcryptjs";
 import {
   PROJECTS,
   NEWS,
@@ -9,12 +10,29 @@ import {
 
 const prisma = new PrismaClient();
 
+const ADMIN_EMAIL    = process.env.ADMIN_EMAIL    ?? "admin@wilkdevelopment.pl";
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD ?? "Admin@2025";
+
 async function main() {
   await prisma.project.deleteMany();
   await prisma.newsItem.deleteMany();
   await prisma.service.deleteMany();
   await prisma.offerSection.deleteMany();
   await prisma.geoCitation.deleteMany();
+
+  // Admin user — upsert żeby nie duplikować przy ponownym seedzie
+  const hashedPassword = await bcrypt.hash(ADMIN_PASSWORD, 12);
+  await prisma.user.upsert({
+    where: { email: ADMIN_EMAIL },
+    update: { password: hashedPassword, role: "ADMIN" },
+    create: {
+      email: ADMIN_EMAIL,
+      name: "Administrator",
+      password: hashedPassword,
+      role: "ADMIN",
+    },
+  });
+  console.log(`Admin: ${ADMIN_EMAIL} / ${ADMIN_PASSWORD}`);
 
   await prisma.project.createMany({
     data: PROJECTS.map((p) => ({
