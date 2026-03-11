@@ -47,7 +47,7 @@ const config = {
           },
         ],
       },
-      // Security headers that also help performance (prevent unnecessary re-fetches)
+      // Security headers
       {
         source: "/(.*)",
         headers: [
@@ -57,6 +57,31 @@ const config = {
           {
             key: "Permissions-Policy",
             value: "camera=(), microphone=(), geolocation=()",
+          },
+          // CSP — Content Security Policy (wymagane przez szefa)
+          {
+            key: "Content-Security-Policy",
+            value: [
+              "default-src 'self'",
+              // Next.js inline scripts + next-auth
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+              // Style: własne + inline (Tailwind)
+              "style-src 'self' 'unsafe-inline'",
+              // Obrazki: własne + Unsplash + Vercel Blob + Supabase Storage
+              "img-src 'self' data: blob: https://images.unsplash.com https://*.public.blob.vercel-storage.com https://xohdpqbaoxennpgtybzk.supabase.co",
+              // Fonty
+              "font-src 'self' data:",
+              // API calls: własne + Supabase
+              "connect-src 'self' https://xohdpqbaoxennpgtybzk.supabase.co https://*.supabase.co",
+              // Frames: zablokowane
+              "frame-src 'none'",
+              // Obiekty: zablokowane
+              "object-src 'none'",
+              // Base URI: tylko własna domena
+              "base-uri 'self'",
+              // Formularze: tylko własna domena
+              "form-action 'self'",
+            ].join("; "),
           },
         ],
       },
