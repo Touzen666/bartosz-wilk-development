@@ -4,7 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { canonical } from "~/lib/seo";
-import { getCachedNews, getCachedNewsItem } from "~/lib/data-cache";
+import { getCachedNews, getCachedNewsItem, getCachedSiteConfig } from "~/lib/data-cache";
 import { Breadcrumbs } from "~/components/Breadcrumbs";
 
 export const revalidate = 600;
@@ -42,15 +42,19 @@ function formatDate(iso: string) {
 }
 
 export default async function NewsItemPage({ params }: Props) {
-  const item = await getCachedNewsItem(params.id);
+  const [item, cfg] = await Promise.all([getCachedNewsItem(params.id), getCachedSiteConfig()]);
   if (!item) notFound();
+  const backLabel  = cfg.aktualnosci_back ?? "Wróć do aktualności";
+  const allLabel   = cfg.aktualnosci_all  ?? "Wszystkie aktualności";
+  const navHome    = cfg.nav_home         ?? "Strona główna";
+  const navAkt     = cfg.nav_aktualnosci  ?? "Aktualności";
 
   return (
     <article className="wp-section mx-auto max-w-3xl px-4 py-12">
       <Breadcrumbs
         items={[
-          { label: "Strona główna", href: "/" },
-          { label: "Aktualności", href: "/aktualnosci" },
+          { label: navHome,    href: "/" },
+          { label: navAkt,     href: "/aktualnosci" },
           { label: item.title, href: `/aktualnosci/${params.id}` },
         ]}
       />
@@ -68,7 +72,7 @@ export default async function NewsItemPage({ params }: Props) {
           textDecoration: "none",
         }}
       >
-        <ArrowLeft size={15} aria-hidden /> Wróć do aktualności
+        <ArrowLeft size={15} aria-hidden /> {backLabel}
       </Link>
 
       <header style={{ marginBottom: "2rem" }}>
@@ -132,7 +136,7 @@ export default async function NewsItemPage({ params }: Props) {
 
       <div style={{ marginTop: "3rem", paddingTop: "2rem", borderTop: "1px solid var(--border)" }}>
         <Link href="/aktualnosci" className="wp-btn-outline">
-          <ArrowLeft size={15} aria-hidden /> Wszystkie aktualności
+          <ArrowLeft size={15} aria-hidden /> {allLabel}
         </Link>
       </div>
     </article>

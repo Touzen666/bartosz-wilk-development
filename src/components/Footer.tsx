@@ -3,22 +3,42 @@ import { Phone, Mail, MapPin } from "lucide-react";
 import { LOCAL_NAV } from "~/lib/seo";
 import { getCachedSiteConfig } from "~/lib/data-cache";
 
-const footerNav = [
-  { href: "/uslugi", label: "Wszystkie usługi" },
-  { href: "/uslugi", label: "Budowa domów szeregowych" },
-  { href: "/uslugi", label: "Remonty pod klucz" },
-  { href: "/uslugi", label: "Wykańczanie wnętrz" },
-  { href: "/uslugi", label: "Budowa tarasów i werand" },
-  { href: "/uslugi", label: "Układanie płytek" },
-] as const;
-
-const localLinks = LOCAL_NAV;
-
 export async function Footer() {
   const cfg = await getCachedSiteConfig();
-  const phone   = cfg.contact_phone   ?? "+48 690 884 961";
-  const email   = cfg.contact_email   ?? "biuro@zlotewynajmy.com";
+
+  const phone           = cfg.contact_phone          ?? "+48 690 884 961";
+  const email           = cfg.contact_email          ?? "biuro@zlotewynajmy.com";
+  const addressStreet   = cfg.contact_address_full   ?? "ul. Kopisto 11/193, 35-315 Rzeszów";
+  const brandDesc       = cfg.footer_brand_desc      ?? "Budujemy i remontujemy od ponad 15 lat.";
+  const servicesHeading = cfg.footer_services_heading ?? "Nasze usługi";
+  const companyHeading  = cfg.footer_company_heading  ?? "Firma";
+  const areaHeading     = cfg.footer_area_heading     ?? "Rzeszów i okolice";
+  const ctaText         = cfg.footer_cta_text         ?? "Potrzebujesz wyceny? Zadzwoń lub napisz.";
+  const btnFreeQuote    = cfg.btn_free_quote           ?? "Bezpłatna wycena";
+  const copyrightTpl    = cfg.footer_copyright ?? "© {year} Wilk Development. Wszelkie prawa zastrzeżone.";
+
   const year = new Date().getFullYear();
+  const copyright = copyrightTpl.replace("{year}", String(year));
+
+  const servicesNavRaw: string[] = (() => {
+    try { return JSON.parse(cfg.footer_services_nav ?? "[]") as string[]; }
+    catch { return ["Wszystkie usługi", "Budowa domów szeregowych", "Remonty pod klucz", "Wykańczanie wnętrz", "Budowa tarasów i werand", "Układanie płytek"]; }
+  })();
+
+  const companyNavRaw: string[] = (() => {
+    try { return JSON.parse(cfg.footer_company_nav ?? "[]") as string[]; }
+    catch { return ["Strona główna", "Aktualności", "Współpraca", "Kontakt"]; }
+  })();
+
+  const companyNavLinks = [
+    { href: "/",            label: companyNavRaw[0] ?? "Strona główna" },
+    { href: "/aktualnosci", label: companyNavRaw[1] ?? "Aktualności" },
+    { href: "/wspolpraca",  label: companyNavRaw[2] ?? "Współpraca" },
+    { href: "/kontakt",     label: companyNavRaw[3] ?? "Kontakt" },
+  ];
+
+  const localLinks = LOCAL_NAV;
+
   return (
     <footer
       style={{
@@ -62,10 +82,10 @@ export async function Footer() {
                 marginTop: "0.2rem",
               }}
             >
-              Rzeszów · Podkarpacie
+              {cfg.header_tagline ?? "Rzeszów · Podkarpacie"}
             </p>
             <p style={{ fontSize: "0.875rem", color: "rgba(255,255,255,0.65)", marginTop: "1rem", lineHeight: 1.65 }}>
-              Budujemy i remontujemy od ponad 15 lat. Domy szeregowe, wykończenia pod klucz, termin i jakość — gwarantowane.
+              {brandDesc}
             </p>
             <div style={{ marginTop: "1.25rem", display: "flex", flexDirection: "column", gap: "0.55rem" }}>
               <a
@@ -96,7 +116,7 @@ export async function Footer() {
                   fontSize: "0.875rem", color: "rgba(255,255,255,0.5)",
                 }}
               >
-                <MapPin size={14} aria-hidden /> ul. Kopisto 11/193, 35-315 Rzeszów
+                <MapPin size={14} aria-hidden /> {addressStreet}
               </span>
             </div>
           </div>
@@ -114,13 +134,13 @@ export async function Footer() {
                 marginBottom: "1rem",
               }}
             >
-              Nasze usługi
+              {servicesHeading}
             </p>
             <ul style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-              {footerNav.map(({ href, label }) => (
+              {servicesNavRaw.map((label) => (
                 <li key={label}>
                   <Link
-                    href={href}
+                    href="/uslugi"
                     style={{
                       fontSize: "0.875rem",
                       color: "rgba(255,255,255,0.65)",
@@ -135,7 +155,7 @@ export async function Footer() {
             </ul>
           </nav>
 
-          {/* Col 3 – Firma (linki nawigacyjne) */}
+          {/* Col 3 – Firma */}
           <nav aria-label="Firma – stopka">
             <p
               style={{
@@ -148,15 +168,10 @@ export async function Footer() {
                 marginBottom: "1rem",
               }}
             >
-              Firma
+              {companyHeading}
             </p>
             <ul style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-              {[
-                { href: "/", label: "Strona główna" },
-                { href: "/aktualnosci", label: "Aktualności" },
-                { href: "/wspolpraca", label: "Współpraca" },
-                { href: "/kontakt", label: "Kontakt" },
-              ].map(({ href, label }) => (
+              {companyNavLinks.map(({ href, label }) => (
                 <li key={href}>
                   <Link
                     href={href}
@@ -187,7 +202,7 @@ export async function Footer() {
                 marginBottom: "1rem",
               }}
             >
-              Rzeszów i okolice
+              {areaHeading}
             </p>
             <ul style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
               {localLinks.map(({ label, href }) => (
@@ -223,10 +238,10 @@ export async function Footer() {
           }}
         >
           <p style={{ fontSize: "0.9375rem", color: "rgba(255,255,255,0.75)", maxWidth: "32rem" }}>
-            Potrzebujesz wyceny? Zadzwoń lub napisz — odpowiadamy szybko.
+            {ctaText}
           </p>
           <Link href="/kontakt" className="wp-btn-primary">
-            Bezpłatna wycena
+            {btnFreeQuote}
           </Link>
         </div>
 
@@ -241,7 +256,7 @@ export async function Footer() {
             color: "rgba(255,255,255,0.35)",
           }}
         >
-          © {year} Wilk Development. Wszelkie prawa zastrzeżone. · Rzeszów, Podkarpacie
+          {copyright}
         </p>
       </div>
     </footer>

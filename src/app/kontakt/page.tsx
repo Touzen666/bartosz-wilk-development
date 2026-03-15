@@ -23,8 +23,27 @@ export const metadata: Metadata = {
 
 export default async function KontaktPage() {
   const cfg = await getCachedSiteConfig();
-  const phone = cfg.contact_phone ?? "+48 690 884 961";
-  const email = cfg.contact_email ?? "biuro@zlotewynajmy.com";
+  const phone           = cfg.contact_phone             ?? "+48 690 884 961";
+  const email           = cfg.contact_email             ?? "biuro@zlotewynajmy.com";
+  const addressFull     = cfg.contact_address_full      ?? "Al. mjr. W. Kopisto 11/193, 35-315 Rzeszów";
+  const hoursWeekdays   = cfg.contact_hours_weekdays    ?? "Pon–Pt 8:00–18:00";
+  const hoursAlldays    = cfg.contact_hours_alldays     ?? "Pon – Sob";
+  const hoursFull       = cfg.contact_hours_full        ?? "8:00 – 18:00 · Niedziela: na zlecenie";
+  const replyTime       = cfg.contact_reply_time        ?? "Odpowiadamy w ciągu 24h";
+  const heroLabel       = cfg.kontakt_hero_label        ?? "Skontaktuj się z nami";
+  const heroHeading     = cfg.kontakt_hero_heading      ?? "Bezpłatna wycena w 24\u00a0h";
+  const heroText        = cfg.kontakt_hero_text         ?? "";
+  const cardPhoneLabel  = cfg.kontakt_card_phone_label  ?? "Telefon";
+  const cardEmailLabel  = cfg.kontakt_card_email_label  ?? "E-mail";
+  const cardAreaLabel   = cfg.kontakt_card_area_label   ?? "Obszar działania";
+  const cardAreaValue   = cfg.kontakt_card_area_value   ?? "Rzeszów i Podkarpacie";
+  const cardHoursLabel  = cfg.kontakt_card_hours_label  ?? "Godziny pracy";
+  const cardHoursValue  = cfg.kontakt_card_hours_value  ?? "Pon – Sob";
+  const ctaHeading      = cfg.kontakt_cta_heading       ?? "Wolisz zadzwonić?";
+  const ctaText         = cfg.kontakt_cta_text          ?? "";
+  const formHeading     = cfg.kontakt_form_heading      ?? "Wyślij zapytanie";
+  const formText        = cfg.kontakt_form_text         ?? "";
+  const btnFreeQuote    = cfg.btn_free_quote            ?? "Bezpłatna wycena";
   return (
     <>
       {/* ── Hero bar ── */}
@@ -38,7 +57,7 @@ export default async function KontaktPage() {
             ]}
           />
           <span className="section-label-dash" style={{ color: "var(--gold)", marginTop: "1rem", display: "inline-flex" }}>
-            Skontaktuj się z nami
+            {heroLabel}
           </span>
           <h1
             style={{
@@ -49,10 +68,10 @@ export default async function KontaktPage() {
               fontWeight: 800,
             }}
           >
-            Bezpłatna wycena w 24&nbsp;h
+            {heroHeading}
           </h1>
           <p style={{ marginTop: "0.75rem", color: "rgba(255,255,255,0.6)", maxWidth: "38rem", lineHeight: 1.72 }}>
-            Masz pytanie o budowę domu, remont lub współpracę? Napisz lub zadzwoń — wycena jest bezpłatna i niezobowiązująca.
+            {heroText}
           </p>
         </div>
       </div>
@@ -70,30 +89,30 @@ export default async function KontaktPage() {
                 {[
                   {
                     icon: Phone,
-                    label: "Telefon",
+                    label: cardPhoneLabel,
                     value: phone,
-                    sub: "Pon–Pt 8:00–18:00",
+                    sub: hoursWeekdays,
                     href: `tel:${phone.replace(/\s/g, "")}`,
                   },
                   {
                     icon: Mail,
-                    label: "E-mail",
+                    label: cardEmailLabel,
                     value: email,
-                    sub: "Odpowiadamy w ciągu 24h",
+                    sub: replyTime,
                     href: `mailto:${email}`,
                   },
                   {
                     icon: MapPin,
-                    label: "Obszar działania",
-                    value: "Rzeszów i Podkarpacie",
-                    sub: "Al. mjr. W. Kopisto 11/193, 35-315 Rzeszów",
+                    label: cardAreaLabel,
+                    value: cardAreaValue,
+                    sub: addressFull,
                     href: undefined,
                   },
                   {
                     icon: Clock,
-                    label: "Godziny pracy",
-                    value: "Pon – Sob",
-                    sub: "8:00 – 18:00 · Niedziela: na zlecenie",
+                    label: cardHoursLabel,
+                    value: cardHoursValue,
+                    sub: hoursFull,
                     href: undefined,
                   },
                 ].map(({ icon: Icon, label, value, sub, href }) => {
@@ -158,10 +177,10 @@ export default async function KontaktPage() {
                   fontFamily: "var(--font-heading, 'Montserrat', sans-serif)",
                   fontWeight: 700, fontSize: "1rem", color: "var(--white)",
                 }}>
-                  Wolisz zadzwonić?
+                  {ctaHeading}
                 </p>
                 <p style={{ fontSize: "0.875rem", color: "rgba(255,255,255,0.6)", lineHeight: 1.65 }}>
-                  Nasz specjalista odpowie na wszystkie pytania i przygotuje wstępną wycenę telefonicznie.
+                  {ctaText}
                 </p>
                 <a
                   href={`tel:${phone.replace(/\s/g, "")}`}
@@ -191,10 +210,10 @@ export default async function KontaktPage() {
                   marginBottom: "0.5rem",
                 }}
               >
-                Wyślij zapytanie
+                {formHeading}
               </h2>
               <p style={{ fontSize: "0.875rem", color: "var(--slate)", marginBottom: "1.75rem", lineHeight: 1.6 }}>
-                Opisz swoje potrzeby — odpowiemy w ciągu 24h z bezpłatną wyceną.
+                {formText}
               </p>
               <ContactForm />
             </div>

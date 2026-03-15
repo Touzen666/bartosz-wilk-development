@@ -1,13 +1,23 @@
 import Link from "next/link";
+import { getCachedSiteConfig } from "~/lib/data-cache";
 
-const nav = [
-  { href: "/", label: "Strona główna" },
-  { href: "/uslugi", label: "Usługi" },
-  { href: "/aktualnosci", label: "Aktualności" },
-  { href: "/wspolpraca", label: "Współpraca" },
-] as const;
+export async function Header() {
+  const cfg = await getCachedSiteConfig();
 
-export function Header() {
+  const tagline       = cfg.header_tagline   ?? "Rzeszów · Podkarpacie";
+  const navHome       = cfg.nav_home         ?? "Strona główna";
+  const navUslugi     = cfg.nav_uslugi       ?? "Usługi";
+  const navAkt        = cfg.nav_aktualnosci  ?? "Aktualności";
+  const navWsp        = cfg.nav_wspolpraca   ?? "Współpraca";
+  const btnFreeQuote  = cfg.btn_free_quote   ?? "Bezpłatna wycena";
+
+  const nav = [
+    { href: "/",            label: navHome   },
+    { href: "/uslugi",      label: navUslugi },
+    { href: "/aktualnosci", label: navAkt    },
+    { href: "/wspolpraca",  label: navWsp    },
+  ];
+
   return (
     <header
       className="sticky top-0 z-50"
@@ -51,7 +61,7 @@ export function Header() {
               color: "var(--gold)",
             }}
           >
-            Rzeszów · Podkarpacie
+            {tagline}
           </span>
         </Link>
 
@@ -112,7 +122,7 @@ export function Header() {
               ))}
               <li className="mt-2 border-t pt-2" style={{ borderColor: "var(--border)" }}>
                 <Link href="/kontakt" className="wp-btn-primary w-full justify-center">
-                  Bezpłatna wycena
+                  {btnFreeQuote}
                 </Link>
               </li>
             </ul>
@@ -145,7 +155,7 @@ export function Header() {
             className="wp-btn-primary ml-3"
             style={{ padding: "0.55rem 1.35rem", fontSize: "0.875rem" }}
           >
-            Bezpłatna wycena
+            {btnFreeQuote}
           </Link>
         </nav>
       </div>
