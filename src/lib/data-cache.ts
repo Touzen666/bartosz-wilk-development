@@ -6,16 +6,13 @@ import type { NewsItem } from "~/data/content";
 
 /**
  * Revalidation windows:
- *  - Static content (offer, services): 1 h
- *  - Projects gallery: 1 h
- *  - News: 10 min (updated more often)
- *  - Blob images list: 1 h
+ *  - All content: 30 days (max) — until admin panel is ready, revalidate via tags manually
  *  - Development: cache wyłączony — zmiany w bazie widoczne od razu
  */
 const DEV = process.env.NODE_ENV === "development";
-const TTL_STANDARD = 3600; // 1 h
-const TTL_NEWS     = 600;  // 10 min
-const TTL_IMAGES   = 3600; // 1 h
+const TTL_STANDARD = 2592000; // 30 days
+const TTL_NEWS     = 2592000; // 30 days
+const TTL_IMAGES   = 2592000; // 30 days
 
 // ─── Offer ───────────────────────────────────────────────────────────────────
 const _getCachedOffer = unstable_cache(
@@ -84,7 +81,7 @@ export async function getCachedNewsItem(id: string) {
   )();
 }
 
-// ─── Services ────────────────────────────────────────────────────────────────
+
 const _getCachedUslugi = unstable_cache(
   async () => {
     const caller = await createCaller();
@@ -98,7 +95,7 @@ export const getCachedUslugi = DEV
   ? () => createCaller().then((c) => c.content.getUslugi())
   : _getCachedUslugi;
 
-// ─── SiteConfig ──────────────────────────────────────────────────────────────
+
 const _getCachedSiteConfig = unstable_cache(
   async () => { const caller = await createCaller(); return caller.content.getSiteConfig(); },
   ["site-config"],
@@ -108,7 +105,7 @@ export const getCachedSiteConfig = DEV
   ? () => createCaller().then((c) => c.content.getSiteConfig())
   : _getCachedSiteConfig;
 
-// ─── FaqItems ────────────────────────────────────────────────────────────────
+
 const _getCachedFaqItems = unstable_cache(
   async () => { const caller = await createCaller(); return caller.content.getFaqItems(); },
   ["faq-items"],
@@ -118,7 +115,7 @@ export const getCachedFaqItems = DEV
   ? () => createCaller().then((c) => c.content.getFaqItems())
   : _getCachedFaqItems;
 
-// ─── ServiceCards ─────────────────────────────────────────────────────────────
+
 const _getCachedServiceCards = unstable_cache(
   async () => { const caller = await createCaller(); return caller.content.getServiceCards(); },
   ["service-cards"],
@@ -128,7 +125,7 @@ export const getCachedServiceCards = DEV
   ? () => createCaller().then((c) => c.content.getServiceCards())
   : _getCachedServiceCards;
 
-// ─── WhyUsItems ───────────────────────────────────────────────────────────────
+
 const _getCachedWhyUsItems = unstable_cache(
   async () => { const caller = await createCaller(); return caller.content.getWhyUsItems(); },
   ["why-us-items"],
@@ -138,7 +135,7 @@ export const getCachedWhyUsItems = DEV
   ? () => createCaller().then((c) => c.content.getWhyUsItems())
   : _getCachedWhyUsItems;
 
-// ─── Geo Citations ────────────────────────────────────────────────────────────
+
 type GeoCitationCategory = "firma" | "statystyki" | "oferta" | "porady" | "kontakt";
 
 const _getCachedGeoCitations = (category?: GeoCitationCategory) =>
