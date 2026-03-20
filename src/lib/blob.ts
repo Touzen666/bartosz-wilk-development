@@ -49,21 +49,41 @@ export function isBlobUrl(url: string): boolean {
 }
 
 /**
- * Zwraca props dla Next.js <Image> z optymalnym lazy loadingiem i cachowaniem.
- * Obrazy blob — lazy loading (domyślny).
- * Obrazy hero (LCP) — eager + priority.
+ * Warianty obrazków — określają atrybut `sizes` przekazywany do Next.js <Image>.
+ * Przeglądarka pobiera obraz dopasowany do faktycznej szerokości slotu,
+ * dzięki czemu telefon nie ściąga zdjęcia w 4K.
+ *
+ *  card    — miniaturka karty projektu / aktualności (max ~600 px)
+ *  article — pełna szerokość artykułu (max ~900 px)
+ *  hero    — baner na pełną szerokość ekranu
+ */
+export type ImageVariant = "card" | "article" | "hero";
+
+const SIZES: Record<ImageVariant, string> = {
+  card:    "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw",
+  article: "(max-width: 768px) 100vw, (max-width: 1200px) 75vw, 900px",
+  hero:    "100vw",
+};
+
+/**
+ * Zwraca props dla Next.js <Image> z optymalnym lazy loadingiem, cachowaniem
+ * i atrybutem `sizes` dopasowanym do wariantu — przeglądarka pobierze obraz
+ * tylko w potrzebnej rozdzielczości (np. 480 px na telefonie zamiast 4K).
  */
 export function getImageProps(
   src: string,
+  variant: ImageVariant = "card",
   isAboveTheFold = false
 ): {
   src: string;
+  sizes: string;
   loading: "lazy" | "eager";
   priority: boolean;
   fetchPriority: "high" | "low" | "auto";
 } {
   return {
     src,
+    sizes: SIZES[variant],
     loading: isAboveTheFold ? "eager" : "lazy",
     priority: isAboveTheFold,
     fetchPriority: isAboveTheFold ? "high" : "auto",
