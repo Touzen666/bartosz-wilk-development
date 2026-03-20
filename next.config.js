@@ -47,6 +47,33 @@ const config = {
           },
         ],
       },
+      // Public static assets (favicon, fonts, icons, manifests)
+      {
+        source: "/favicon(.*)",
+        headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }],
+      },
+      {
+        source: "/fonts/(.*)",
+        headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }],
+      },
+      {
+        source: "/icons/(.*)",
+        headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }],
+      },
+      {
+        source: "/images/(.*)",
+        headers: [{ key: "Cache-Control", value: "public, max-age=604800, stale-while-revalidate=86400" }],
+      },
+      // HTML pages – CDN edge cache 60 s, revalidate in background up to 1 h
+      {
+        source: "/((?!api|_next|favicon|fonts|icons|images).*)",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, s-maxage=60, stale-while-revalidate=3600",
+          },
+        ],
+      },
       // Security headers
       {
         source: "/(.*)",
