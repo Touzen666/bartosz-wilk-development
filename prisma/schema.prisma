@@ -1,60 +1,220 @@
-// Wilk Development — schemat na przyszłe przejście z content.ts na bazę.
-// Obecnie aplikacja korzysta z src/data/content.ts; po ustawieniu DATABASE_URL
-// i uruchomieniu migracji + seed możesz przełączyć na Prisma (patrz README / env).
+// ============================================================
+// Wilk Development — schemat bazy danych (Prisma + PostgreSQL / Supabase)
+// ============================================================
+// Dane źródłowe: src/data/content.ts
+// Po konfiguracji .env uruchom:
+//   npm run db:push   → synchronizacja schematu z bazą
+//   npm run db:seed   → wgranie danych początkowych
+//   npm run db:studio → panel graficzny http://localhost:5555
+// Dokumentacja: prisma/README.md
+// ============================================================
 
 generator client {
   provider = "prisma-client-js"
 }
 
 generator zod {
-  provider                         = "zod-prisma-types"
-  output                           = "../src/generated/zod"
-  createInputTypes                 = false
-  addIncludeType                   = false
-  addSelectType                    = false
+  provider         = "zod-prisma-types"
+  output           = "../src/generated/zod"
+  createInputTypes = false
+  addIncludeType   = false
+  addSelectType    = false
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("POSTGRES_PRISMA_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
 }
 
+// ─── Project — Projekty ──────────────────────────────────────────────────────
+// Projekty budowlane firmy widoczne w galerii na stronie.
 model Project {
+  /// Unikalny identyfikator (np. "proj-001")
   id          String   @id
+  /// Nazwa projektu wyświetlana na karcie
   title       String
-  category    String   // "domy-szeregowe" | "remonty"
+  /// Kategoria: "domy-szeregowe" | "remonty"
+  category    String
+  /// Opis projektu widoczny po rozwinięciu karty
   description String
+  /// Ścieżka do zdjęcia głównego (relatywna, np. "/images/proj-001.jpg")
   imageUrl    String
-  status      String   // "W sprzedaży" | "Zakończone"
+  /// Status realizacji: "W sprzedaży" | "Zakończone"
+  status      String
+  /// Data dodania rekordu (ustawiana automatycznie)
   createdAt   DateTime @default(now())
+  /// Data ostatniej modyfikacji (aktualizowana automatycznie)
   updatedAt   DateTime @updatedAt
 }
 
+// ─── NewsItem — Aktualności ───────────────────────────────────────────────────
+// Artykuły i aktualności publikowane w sekcji "Aktualności" na stronie.
 model NewsItem {
+  /// Unikalny identyfikator (np. "news-001")
   id        String   @id
+  /// Tytuł artykułu
   title     String
+  /// Krótki opis (zajawka) wyświetlany na liście aktualności
   excerpt   String
+  /// Pełna treść artykułu (może zawierać HTML lub Markdown)
   body      String
-  date      String   // ISO date
+  /// Data publikacji w formacie ISO (np. "2024-03-01")
+  date      String
+  /// Ścieżka do zdjęcia artykułu (relatywna)
   imageUrl  String
+  /// Data dodania rekordu (ustawiana automatycznie)
+  createdAt DateTime @default(now())
+  /// Data ostatniej modyfikacji (aktualizowana automatycznie)
+  updatedAt DateTime @updatedAt
+}
+
+// ─── Service — Usługi ────────────────────────────────────────────────────────
+// Lista usług świadczonych przez firmę (wyświetlana na stronie głównej).
+model Service {
+  /// Unikalny identyfikator (np. "s-0")
+  id    String @id
+  /// Nazwa usługi wyświetlana na stronie
+  name  String
+  /// Kolejność wyświetlania na liście (rosnąco, domyślnie 0)
+  order Int    @default(0)
+}
+
+// ─── Auth — Role ──────────────────────────────────────────────────────────────
+enum Role {
+  USER
+  ADMIN
+}
+
+// ─── Auth — User ──────────────────────────────────────────────────────────────
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  /// Hashed password (bcrypt) — null dla kont OAuth
+  password      String?
+  role          Role      @default(USER)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  accounts      Account[]
+  sessions      Session[]
+}
+
+// ─── Auth — Account (OAuth providers) ────────────────────────────────────────
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+// ─── Auth — Session ───────────────────────────────────────────────────────────
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ─── Auth — VerificationToken ─────────────────────────────────────────────────
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ─── SiteConfig — Konfiguracja strony (klucz → wartość) ─────────────────────
+// Przykładowe klucze: about_intro, contact_phone, hero_image_main, geo_years…
+model SiteConfig {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}
+
+// ─── FaqItem — Pytania i odpowiedzi FAQ ───────────────────────────────────────
+model FaqItem {
+  id        String   @id @default(cuid())
+  question  String
+  answer    String
+  order     Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-model Service {
-  id    String @id
-  name  String
-  order Int    @default(0)
+// ─── ServiceCard — Karty usług (sekcja "Jakość usług") ───────────────────────
+model ServiceCard {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  imageUrl    String
+  /// Nazwa ikony z lucide-react (np. "Building2", "Paintbrush")
+  iconName    String
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
-// Sekcje oferty (domy szeregowe, remonty pod klucz)
-model OfferSection {
-  id          String   @id
-  slug        String   @unique // np. "domy-szeregowe", "remonty-pod-klucz"
+// ─── WhyUsItem — Dlaczego Wilk Development ───────────────────────────────────
+model WhyUsItem {
+  id          String   @id @default(cuid())
   title       String
-  subtitle    String
   description String
-  highlights  String   // JSON array of strings
+  order       Int      @default(0)
   createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// ─── GeoCitation — Zdania GEO/AI-citation ────────────────────────────────────
+// Krótkie zdania cytowane przez modele AI (Gemini, ChatGPT, Perplexity, AI Overviews).
+// Kategorie: "firma" | "statystyki" | "oferta" | "porady" | "kontakt"
+model GeoCitation {
+  /// Unikalny identyfikator (np. "geo-001")
+  id        String   @id
+  /// Kategoria tematyczna zdania
+  category  String
+  /// Treść zdania zoptymalizowanego pod cytowanie przez AI
+  text      String
+  /// Kolejność wyświetlania w ramach kategorii (rosnąco)
+  order     Int      @default(0)
+  /// Data dodania rekordu (ustawiana automatycznie)
+  createdAt DateTime @default(now())
+  /// Data ostatniej modyfikacji (aktualizowana automatycznie)
+  updatedAt DateTime @updatedAt
+}
+
+// ─── OfferSection — Sekcje oferty ────────────────────────────────────────────
+// Sekcje strony oferty: "Domy Szeregowe" i "Remonty pod klucz".
+model OfferSection {
+  /// Unikalny identyfikator (np. "offer-domy")
+  id          String   @id
+  /// Identyfikator w URL (np. "domy-szeregowe", "remonty-pod-klucz") — musi być unikalny
+  slug        String   @unique
+  /// Nagłówek sekcji oferty
+  title       String
+  /// Podtytuł sekcji oferty
+  subtitle    String
+  /// Pełny opis oferty
+  description String
+  /// Lista punktów kluczowych oferty (przechowywana jako JSON, np. ["Punkt 1","Punkt 2"])
+  highlights  String
+  /// Data dodania rekordu (ustawiana automatycznie)
+  createdAt   DateTime @default(now())
+  /// Data ostatniej modyfikacji (aktualizowana automatycznie)
   updatedAt   DateTime @updatedAt
 }

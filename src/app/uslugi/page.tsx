@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { canonical } from "~/lib/seo";
 import { Breadcrumbs } from "~/components/Breadcrumbs";
-import { getCachedUslugi } from "~/lib/data-cache";
+import { getCachedUslugi, getCachedSiteConfig } from "~/lib/data-cache";
 
 export const revalidate = 3600; // ISR: regeneruj co 1 h
 
@@ -20,26 +20,31 @@ export const metadata: Metadata = {
 };
 
 export default async function UslugiPage() {
-  const uslugi = await getCachedUslugi();
+  const [uslugi, cfg] = await Promise.all([getCachedUslugi(), getCachedSiteConfig()]);
+  const heading        = cfg.uslugi_heading         ?? "Usługi";
+  const uslugiIntro    = cfg.uslugi_intro           ?? "Oferujemy kompleksowe usługi budowlane i remontowe.";
+  const relatedHeading = cfg.uslugi_related_heading ?? "Powiązane usługi";
+  const relatedText    = cfg.uslugi_related_text    ?? "";
+  const ctaText        = cfg.uslugi_cta             ?? "Wyceń remont lub budowę w Rzeszowie";
+  const navHome        = cfg.nav_home               ?? "Strona główna";
+  const navUslugi      = cfg.nav_uslugi             ?? "Usługi";
 
   return (
     <div className="wp-section mx-auto max-w-4xl px-4 py-12">
       <Breadcrumbs
         items={[
-          { label: "Strona główna", href: "/" },
-          { label: "Usługi", href: "/uslugi" },
+          { label: navHome,    href: "/" },
+          { label: navUslugi,  href: "/uslugi" },
         ]}
       />
       <header>
-        <h1 className="text-3xl font-bold text-charcoal">Usługi</h1>
-        <p className="mt-2 text-charcoal/80">
-          Oferujemy kompleksowe usługi budowlane i remontowe — od budowy tarasów i werand po wykończanie wnętrz i remonty pod klucz.
-        </p>
+        <h1 className="text-3xl font-bold text-charcoal">{heading}</h1>
+        <p className="mt-2 text-charcoal/80">{uslugiIntro}</p>
       </header>
 
       <section className="mt-10" aria-labelledby="lista-uslug">
         <h2 id="lista-uslug" className="sr-only">
-          Lista oferowanych usług
+          {heading}
         </h2>
         <ul className="grid gap-3 sm:grid-cols-2">
           {uslugi.map((nazwa: string) => (
@@ -54,11 +59,10 @@ export default async function UslugiPage() {
 
       <section className="mt-10" aria-labelledby="powiazane-heading">
         <h2 id="powiazane-heading" className="mb-4 text-lg font-semibold text-charcoal">
-          Powiązane usługi
+          {relatedHeading}
         </h2>
         <p className="mb-3 text-sm text-charcoal-soft">
-          Remont łazienki łączy się z <Link href="/kontakt" className="text-amber hover:underline">instalacjami hydraulicznymi</Link> oraz <Link href="/kontakt" className="text-amber hover:underline">układaniem płytek w Rzeszowie</Link>. 
-          Domy szeregowe i budowa od zera? Zobacz naszą ofertę <Link href="/" className="text-amber hover:underline">budowy domów szeregowych</Link> oraz <Link href="/" className="text-amber hover:underline">wykańczania wnętrz pod klucz</Link>.
+          {relatedText}
         </p>
       </section>
 
@@ -67,7 +71,7 @@ export default async function UslugiPage() {
           href="/kontakt"
           className="inline-block rounded-lg bg-amber px-6 py-3 font-medium text-white transition hover:bg-amber/90"
         >
-          Wyceń remont lub budowę w Rzeszowie
+          {ctaText}
         </Link>
       </p>
     </div>

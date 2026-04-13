@@ -1,6 +1,4 @@
-/**
- * Central SEO config. Set BASE_URL to your production domain before deploy.
- */
+
 export const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://wilkdevelopment.pl";
 
 export const SITE_NAME = "Wilk Development";

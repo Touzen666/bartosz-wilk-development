@@ -11,6 +11,10 @@ const config = {
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "images.unsplash.com", pathname: "/**" },
+      // Vercel Blob Storage — obrazki projektu
+      { protocol: "https", hostname: "*.public.blob.vercel-storage.com", pathname: "/**" },
+      // Supabase Storage
+      { protocol: "https", hostname: "xohdpqbaoxennpgtybzk.supabase.co", pathname: "/storage/v1/object/public/**" },
     ],
     // Prefer AVIF (smallest), fallback to WebP
     formats: ["image/avif", "image/webp"],
@@ -43,7 +47,34 @@ const config = {
           },
         ],
       },
-      // Security headers that also help performance (prevent unnecessary re-fetches)
+      // Public static assets (favicon, fonts, icons, manifests)
+      {
+        source: "/favicon(.*)",
+        headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }],
+      },
+      {
+        source: "/fonts/(.*)",
+        headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }],
+      },
+      {
+        source: "/icons/(.*)",
+        headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }],
+      },
+      {
+        source: "/images/(.*)",
+        headers: [{ key: "Cache-Control", value: "public, max-age=604800, stale-while-revalidate=86400" }],
+      },
+      // HTML pages – CDN edge cache 60 s, revalidate in background up to 1 h
+      {
+        source: "/((?!api|_next|favicon|fonts|icons|images).*)",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, s-maxage=60, stale-while-revalidate=3600",
+          },
+        ],
+      },
+      // Security headers
       {
         source: "/(.*)",
         headers: [
@@ -53,6 +84,31 @@ const config = {
           {
             key: "Permissions-Policy",
             value: "camera=(), microphone=(), geolocation=()",
+          },
+          // CSP — Content Security Policy (wymagane przez szefa)
+          {
+            key: "Content-Security-Policy",
+            value: [
+              "default-src 'self'",
+              // Next.js inline scripts + next-auth
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+              // Style: własne + inline (Tailwind)
+              "style-src 'self' 'unsafe-inline'",
+              // Obrazki: własne + Unsplash + Vercel Blob + Supabase Storage
+              "img-src 'self' data: blob: https://images.unsplash.com https://*.public.blob.vercel-storage.com https://xohdpqbaoxennpgtybzk.supabase.co",
+              // Fonty
+              "font-src 'self' data:",
+              // API calls: własne + Supabase
+              "connect-src 'self' https://xohdpqbaoxennpgtybzk.supabase.co https://*.supabase.co",
+              // Frames: zablokowane
+              "frame-src 'none'",
+              // Obiekty: zablokowane
+              "object-src 'none'",
+              // Base URI: tylko własna domena
+              "base-uri 'self'",
+              // Formularze: tylko własna domena
+              "form-action 'self'",
+            ].join("; "),
           },
         ],
       },

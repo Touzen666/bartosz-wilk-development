@@ -17,16 +17,11 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { canonical } from "~/lib/seo";
-import { getCachedOffer, getCachedProjects, getCachedUslugi } from "~/lib/data-cache";
 import {
-  ABOUT_INTRO,
-  WHY_US,
-  CONTACT_SNIPPET,
-  HERO_IMAGES,
-  GEO_STATS,
-  OFFER_PSR,
-  FAQ_ITEMS,
-} from "~/data/content";
+  getCachedOffer, getCachedProjects, getCachedUslugi,
+  getCachedSiteConfig, getCachedFaqItems, getCachedServiceCards,
+  getCachedWhyUsItems,
+} from "~/lib/data-cache";
 import { TrendingUp, Users, Calendar, Award } from "lucide-react";
 import { GeoFaq } from "~/components/GeoFaq";
 import { GeoSpeakableSchema } from "~/components/GeoSpeakableSchema";
@@ -48,11 +43,90 @@ export const metadata: Metadata = {
 };
 
 export default async function HomePage() {
-  const [offer, projects, uslugi] = await Promise.all([
+  const [offer, projects, uslugi, cfg, faqItems, serviceCards, whyUsItems] = await Promise.all([
     getCachedOffer(),
     getCachedProjects(),
     getCachedUslugi(),
+    getCachedSiteConfig(),
+    getCachedFaqItems(),
+    getCachedServiceCards(),
+    getCachedWhyUsItems(),
   ]);
+
+  // ── Hero ─────────────────────────────────────────────────────────────────
+  const heroTagline     = cfg.hero_tagline     ?? "Rzeszów · Podkarpacie · od 2010 roku";
+  const heroHeading     = cfg.hero_heading     ?? "Budujemy i remontujemy pod klucz";
+  const heroDescription = cfg.hero_description ?? "";
+  const heroImageMain   = cfg.hero_image_main  ?? "";
+  const btnFreeQuote    = cfg.btn_free_quote   ?? "Bezpłatna wycena";
+  const heroCTANews     = cfg.home_hero_cta_news ?? "Aktualności";
+  // ── About ────────────────────────────────────────────────────────────────
+  const aboutIntro      = cfg.about_intro             ?? "";
+  const aboutLabel      = cfg.home_about_label        ?? "O firmie";
+  const aboutHeadMid    = cfg.home_about_heading_mid  ?? "+ lat";
+  const aboutHeadBot    = cfg.home_about_heading_bot  ?? "nieprzerwanego sukcesu";
+  const aboutWorkCTA    = cfg.home_about_work_cta     ?? "Pracuj z nami";
+  const yearsOnMarket   = cfg.geo_years_on_market     ?? "15";
+  const completedProjects = cfg.geo_completed_projects ?? "setki";
+  // ── Stats ────────────────────────────────────────────────────────────────
+  const statCompletedLabel = cfg.home_stat_completed_label ?? "Zrealizowanych projektów";
+  const statYearsLabel     = cfg.home_stat_years_label     ?? "Lat na rynku budowlanym";
+  const statContactVal     = cfg.home_stat_contact_val     ?? "1 kontakt";
+  const statContactLabel   = cfg.home_stat_contact_label   ?? "Jedna firma, pełna obsługa";
+  const statCertVal        = cfg.home_stat_cert_val        ?? "100%";
+  const statCertLabel      = cfg.home_stat_cert_label      ?? "Certyfikowane materiały";
+  // ── Services section ─────────────────────────────────────────────────────
+  const servicesLabel   = cfg.home_services_label   ?? "Nasze usługi";
+  const servicesHeading = cfg.home_services_heading ?? "Jakość usług budowlanych";
+  // ── Offer section ────────────────────────────────────────────────────────
+  const offerLabel        = cfg.home_offer_label        ?? "Nasza oferta";
+  const offerHeading      = cfg.home_offer_heading      ?? "Co robimy najlepiej?";
+  const offerDomyCTA      = cfg.home_offer_domy_cta     ?? "Wyceń budowę domu";
+  const offerDomyLink     = cfg.home_offer_domy_link    ?? "Wykańczanie wnętrz Rzeszów →";
+  const offerRemontyCTA   = cfg.home_offer_remonty_cta  ?? "Wyceń remont";
+  const offerRemontyLink  = cfg.home_offer_remonty_link ?? "Układanie płytek Rzeszów →";
+  const psrDomyResult     = cfg.offer_psr_domy_result    ?? "";
+  const psrRemontyResult  = cfg.offer_psr_remonty_result ?? "";
+  // ── Split section ────────────────────────────────────────────────────────
+  const sustainableLabel   = cfg.home_sustainable_label   ?? "Zrównoważony rozwój";
+  const sustainableHeading = cfg.home_sustainable_heading ?? "Zaangażowani w bezpieczne i solidne budownictwo";
+  const sustainableText    = cfg.home_sustainable_text    ?? "";
+  const sustainableCTA     = cfg.home_sustainable_cta     ?? "Pracuj z nami";
+  const bestHeading        = cfg.home_best_heading        ?? "Jesteśmy najlepsi w branży";
+  const bestText           = cfg.home_best_text           ?? "";
+  const bestFeatures: string[] = (() => {
+    try { return JSON.parse(cfg.home_best_features ?? "[]") as string[]; }
+    catch { return ["Certyfikowane materiały budowlane", "Realizacja na czas — gwarancja w umowie", "Nowoczesne technologie i projekty", "Najnowszy design i wykończenia premium"]; }
+  })();
+  // ── Usługi list section ───────────────────────────────────────────────────
+  const uslugiLabel   = cfg.home_uslugi_label   ?? "Co oferujemy";
+  const uslugiHeading = cfg.home_uslugi_heading ?? "Pełna lista usług budowlanych";
+  const uslugiText    = cfg.home_uslugi_text    ?? "";
+  const uslugiCTA     = cfg.home_uslugi_cta     ?? "Zobacz pełną listę usług";
+  // ── Why us section ───────────────────────────────────────────────────────
+  const whyUsLabel   = cfg.home_whyus_label   ?? "Dlaczego my";
+  const whyUsHeading = cfg.home_whyus_heading ?? "Dlaczego Wilk Development?";
+  // ── FAQ section ──────────────────────────────────────────────────────────
+  const faqLabel   = cfg.home_faq_label   ?? "FAQ";
+  const faqHeading = cfg.home_faq_heading ?? "Masz pytania?";
+  // ── Projects section ─────────────────────────────────────────────────────
+  const projectsLabel   = cfg.home_projects_label   ?? "Realizacje";
+  const projectsHeading = cfg.home_projects_heading ?? "Galeria naszych inwestycji";
+  const projectsText    = cfg.home_projects_text    ?? "";
+  // ── Contact section ──────────────────────────────────────────────────────
+  const contactLabel      = cfg.home_contact_label       ?? "Skontaktuj się z nami";
+  const contactHeading    = cfg.home_contact_heading     ?? "Bezpłatna wycena w 24\u00a0h";
+  const contactText       = cfg.home_contact_text        ?? "";
+  const contactPhoneLabel = cfg.home_contact_phone_label ?? "Zadzwoń teraz";
+  const contactEmailLabel = cfg.home_contact_email_label ?? "Napisz do nas";
+  const contactAreaLabel  = cfg.home_contact_area_label  ?? "Obszar działania";
+  const contactAreaValue  = cfg.home_contact_area_value  ?? "Rzeszów";
+  const contactAreaSub    = cfg.home_contact_area_sub    ?? "i całe Podkarpacie";
+  const contactFormCTA    = cfg.home_contact_form_cta    ?? "Wypełnij formularz kontaktowy";
+  const contactPhone      = cfg.contact_phone  ?? "";
+  const contactEmail      = cfg.contact_email  ?? "";
+  const contactHoursWd    = cfg.contact_hours_weekdays ?? "Pon–Pt 8:00–18:00";
+  const contactReplyTime  = cfg.contact_reply_time     ?? "Odpowiadamy w ciągu 24h";
 
   return (
     <>
@@ -67,7 +141,7 @@ export default async function HomePage() {
         aria-labelledby="hero-heading"
       >
         <Image
-          src={HERO_IMAGES.main}
+          src={heroImageMain}
           alt="Nowoczesne osiedle domów szeregowych w wieczornym świetle"
           fill
           priority
@@ -91,7 +165,7 @@ export default async function HomePage() {
         >
           <div style={{ maxWidth: "44rem" }}>
             <span className="section-label-dash" style={{ color: "var(--gold)" }}>
-              Rzeszów · Podkarpacie · od 2010 roku
+              {heroTagline}
             </span>
             <h1
               id="hero-heading"
@@ -105,8 +179,7 @@ export default async function HomePage() {
                 marginTop: "0.5rem",
               }}
             >
-              Budujemy i remontujemy{" "}
-              <span style={{ color: "var(--gold)" }}>pod klucz</span>
+              {heroHeading}
             </h1>
             <p
               style={{
@@ -117,15 +190,15 @@ export default async function HomePage() {
                 maxWidth: "36rem",
               }}
             >
-              Wilk Development — domy szeregowe, remonty mieszkań i wykończenia wnętrz. Jedna firma, pełna realizacja, terminowość gwarantowana.
+              {heroDescription}
             </p>
             <div style={{ display: "flex", flexWrap: "wrap", gap: "0.875rem", marginTop: "2.5rem" }}>
               <Link href="/kontakt" className="wp-btn-primary">
-                Bezpłatna wycena
+                {btnFreeQuote}
                 <ArrowRight size={16} aria-hidden />
               </Link>
               <Link href="/aktualnosci" className="wp-btn-outline">
-                Aktualności
+                {heroCTANews}
               </Link>
             </div>
           </div>
@@ -142,7 +215,7 @@ export default async function HomePage() {
         >
           {/* Left: gold panel */}
           <div className="stats-split-left">
-            <span className="section-label-dash" style={{ color: "var(--navy)" }}>O firmie</span>
+            <span className="section-label-dash" style={{ color: "var(--navy)" }}>{aboutLabel}</span>
             <h2
               id="about-heading"
               style={{
@@ -151,10 +224,10 @@ export default async function HomePage() {
                 lineHeight: 1.2,
               }}
             >
-              {GEO_STATS.yearsOnMarket}+ lat<br />nieprzerwanego sukcesu
+              {yearsOnMarket}{aboutHeadMid}<br />{aboutHeadBot}
             </h2>
             <p style={{ fontSize: "0.9375rem", color: "rgba(10,18,30,0.75)", lineHeight: 1.7 }}>
-              {ABOUT_INTRO}
+              {aboutIntro}
             </p>
             <div>
               <Link
@@ -170,7 +243,7 @@ export default async function HomePage() {
                 }}
                 className="hover:opacity-80"
               >
-                Pracuj z nami <ArrowRight size={14} aria-hidden />
+                {aboutWorkCTA} <ArrowRight size={14} aria-hidden />
               </Link>
             </div>
           </div>
@@ -178,10 +251,10 @@ export default async function HomePage() {
           {/* Right: 2x2 stats grid */}
           <div className="stats-split-right">
             {[
-              { icon: TrendingUp, value: `${GEO_STATS.completedProjects}+`, label: "Zrealizowanych projektów" },
-              { icon: Calendar,   value: `${GEO_STATS.yearsOnMarket}+`,     label: "Lat na rynku budowlanym" },
-              { icon: Users,      value: "1 kontakt",                        label: "Jedna firma, pełna obsługa" },
-              { icon: Award,      value: "100%",                             label: "Certyfikowane materiały" },
+              { icon: TrendingUp, value: `${completedProjects}+`, label: statCompletedLabel },
+              { icon: Calendar,   value: `${yearsOnMarket}+`,     label: statYearsLabel },
+              { icon: Users,      value: statContactVal,          label: statContactLabel },
+              { icon: Award,      value: statCertVal,             label: statCertLabel },
             ].map(({ icon: Icon, value, label }) => (
               <div key={label} className="stat-item">
                 <span className="stat-icon">
@@ -207,9 +280,9 @@ export default async function HomePage() {
       >
         <div className="wp-section mx-auto max-w-content">
           <div style={{ textAlign: "center", maxWidth: "40rem", margin: "0 auto" }}>
-            <span className="section-label-dash" style={{ justifyContent: "center" }}>Nasze usługi</span>
+            <span className="section-label-dash" style={{ justifyContent: "center" }}>{servicesLabel}</span>
             <h2 id="why-heading" style={{ marginTop: "0.5rem" }}>
-              Jakość usług budowlanych
+              {servicesHeading}
             </h2>
           </div>
           <ul
@@ -221,45 +294,45 @@ export default async function HomePage() {
               listStyle: "none",
             }}
           >
-            {[
-              { icon: Building2,   title: "Budowa domów",        desc: "Domy szeregowe i jednorodzinne od fundamentów po klucze.",        img: "https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=600&q=80&auto=format&fit=crop" },
-              { icon: Paintbrush,  title: "Wykończenia wnętrz",  desc: "Kompleksowe wykończenia i aranżacje wnętrz pod klucz.",            img: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&q=80&auto=format&fit=crop" },
-              { icon: Ruler,       title: "Budowa tarasów",      desc: "Tarasy i werandy z trwałych materiałów — projekt i wykonanie.",    img: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80&auto=format&fit=crop" },
-              { icon: Lightbulb,   title: "Instalacje",          desc: "Elektryka, hydraulika i ogrzewanie — certyfikowani specjaliści.",  img: "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=600&q=80&auto=format&fit=crop" },
-              { icon: ShieldCheck, title: "Remonty mieszkań",    desc: "Pełny remont mieszkań i lokali użytkowych w Rzeszowie.",           img: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=600&q=80&auto=format&fit=crop" },
-              { icon: Layers,      title: "Układanie płytek",    desc: "Greś, gres porcelanowy, mozaika — łazienki, kuchnie, tarasy.",     img: "https://images.unsplash.com/photo-1581858726788-75bc0f6a952d?w=600&q=80&auto=format&fit=crop" },
-            ].map(({ icon: Icon, title, desc, img }) => (
-              <li key={title}>
-                <div className="spc">
-                  <div className="spc-photo">
-                    <Image
-                      src={img}
-                      alt={title}
-                      fill
-                      loading="lazy"
-                      className="object-cover"
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    />
-                  </div>
-                  <div className="spc-body">
-                    <span className="spc-icon">
-                      <Icon size={18} aria-hidden />
-                    </span>
-                    <div>
-                      <p style={{
-                        fontFamily: "var(--font-heading, 'Montserrat', sans-serif)",
-                        fontWeight: 700, fontSize: "0.9375rem", color: "var(--charcoal)",
-                      }}>
-                        {title}
-                      </p>
-                      <p style={{ marginTop: "0.3rem", fontSize: "0.8125rem", color: "var(--slate)", lineHeight: 1.6 }}>
-                        {desc}
-                      </p>
+            {serviceCards.map((card) => {
+              const iconMap: Record<string, React.ElementType> = {
+                Building2: Building2, Paintbrush: Paintbrush, Ruler: Ruler,
+                Lightbulb: Lightbulb, ShieldCheck: ShieldCheck, Layers: Layers,
+              };
+              const Icon = iconMap[card.iconName] ?? Building2;
+              return (
+                <li key={card.id}>
+                  <div className="spc">
+                    <div className="spc-photo">
+                      <Image
+                        src={card.imageUrl}
+                        alt={card.title}
+                        fill
+                        loading="lazy"
+                        className="object-cover"
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      />
+                    </div>
+                    <div className="spc-body">
+                      <span className="spc-icon">
+                        <Icon size={18} aria-hidden />
+                      </span>
+                      <div>
+                        <p style={{
+                          fontFamily: "var(--font-heading, 'Montserrat', sans-serif)",
+                          fontWeight: 700, fontSize: "0.9375rem", color: "var(--charcoal)",
+                        }}>
+                          {card.title}
+                        </p>
+                        <p style={{ marginTop: "0.3rem", fontSize: "0.8125rem", color: "var(--slate)", lineHeight: 1.6 }}>
+                          {card.description}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </li>
-            ))}
+                </li>
+              );
+            })}
           </ul>
         </div>
       </section>
@@ -274,9 +347,9 @@ export default async function HomePage() {
       >
         <div className="wp-section mx-auto max-w-content">
           <div style={{ textAlign: "center", maxWidth: "40rem", margin: "0 auto" }}>
-            <span className="section-label">Nasza oferta</span>
+            <span className="section-label">{offerLabel}</span>
             <h2 id="offer-heading" style={{ marginTop: "0.5rem" }}>
-              Co robimy <span style={{ color: "var(--gold)" }}>najlepiej?</span>
+              {offerHeading}
             </h2>
           </div>
           <div style={{ marginTop: "3rem", display: "grid", gap: "1.75rem" }}
@@ -302,7 +375,7 @@ export default async function HomePage() {
               </div>
 
               <p style={{ marginTop: "1.25rem", fontSize: "0.9375rem", color: "var(--charcoal-soft)", lineHeight: 1.72 }}>
-                {OFFER_PSR.domySzeregowe.result}
+                {psrDomyResult}
               </p>
 
               <ul style={{ marginTop: "1.25rem", display: "flex", flexDirection: "column", gap: "0.4rem" }}>
@@ -316,11 +389,11 @@ export default async function HomePage() {
 
               <div style={{ marginTop: "1.5rem", display: "flex", flexWrap: "wrap", gap: "0.625rem" }}>
                 <Link href="/kontakt" className="wp-btn-primary" style={{ fontSize: "0.875rem" }}>
-                  Wyceń budowę domu <ArrowRight size={14} aria-hidden />
+                  {offerDomyCTA} <ArrowRight size={14} aria-hidden />
                 </Link>
                 <Link href="/uslugi" style={{ fontSize: "0.8125rem", color: "var(--gold)", fontWeight: 600, alignSelf: "center" }}
                       className="hover:underline">
-                  Wykańczanie wnętrz Rzeszów →
+                  {offerDomyLink}
                 </Link>
               </div>
             </article>
@@ -345,7 +418,7 @@ export default async function HomePage() {
               </div>
 
               <p style={{ marginTop: "1.25rem", fontSize: "0.9375rem", color: "var(--charcoal-soft)", lineHeight: 1.72 }}>
-                {OFFER_PSR.remontyPodKlucz.result}
+                {psrRemontyResult}
               </p>
 
               <ul style={{ marginTop: "1.25rem", display: "flex", flexDirection: "column", gap: "0.4rem" }}>
@@ -359,11 +432,11 @@ export default async function HomePage() {
 
               <div style={{ marginTop: "1.5rem", display: "flex", flexWrap: "wrap", gap: "0.625rem" }}>
                 <Link href="/kontakt" className="wp-btn-primary" style={{ fontSize: "0.875rem" }}>
-                  Wyceń remont <ArrowRight size={14} aria-hidden />
+                  {offerRemontyCTA} <ArrowRight size={14} aria-hidden />
                 </Link>
                 <Link href="/uslugi" style={{ fontSize: "0.8125rem", color: "var(--gold)", fontWeight: 600, alignSelf: "center" }}
                       className="hover:underline">
-                  Układanie płytek Rzeszów →
+                  {offerRemontyLink}
                 </Link>
               </div>
             </article>
@@ -391,7 +464,7 @@ export default async function HomePage() {
             style={{ zIndex: 0, opacity: 0.25 }}
           />
           <div style={{ position: "relative", zIndex: 1 }}>
-            <span className="section-label-dash">Zrównoważony rozwój</span>
+            <span className="section-label-dash">{sustainableLabel}</span>
             <h2
               id="process-heading"
               style={{
@@ -400,10 +473,10 @@ export default async function HomePage() {
                 fontSize: "clamp(1.6rem, 3vw, 2.25rem)",
               }}
             >
-              Zaangażowani w bezpieczne i solidne budownictwo
+              {sustainableHeading}
             </h2>
             <p style={{ fontSize: "0.9375rem", color: "rgba(255,255,255,0.65)", lineHeight: 1.75 }}>
-              Każda budowa i remont realizowane są z dbałością o jakość, bezpieczeństwo i terminy. Wilk Development to gwarancja spokoju inwestora.
+              {sustainableText}
             </p>
             <Link
               href="/wspolpraca"
@@ -419,7 +492,7 @@ export default async function HomePage() {
               }}
               className="hover:opacity-85"
             >
-              Pracuj z nami <ArrowRight size={14} aria-hidden />
+              {sustainableCTA} <ArrowRight size={14} aria-hidden />
             </Link>
           </div>
         </div>
@@ -433,17 +506,17 @@ export default async function HomePage() {
               lineHeight: 1.25,
             }}
           >
-            Jesteśmy najlepsi w branży
+            {bestHeading}
           </h2>
           <p style={{ fontSize: "0.9375rem", color: "rgba(10,18,30,0.72)", lineHeight: 1.72 }}>
-            Ponad {GEO_STATS.yearsOnMarket} lat doświadczenia w budownictwie i wykończeniach na terenie Rzeszowa i Podkarpacia. Jedna firma — pełna odpowiedzialność za projekt.
+            {bestText}
           </p>
           <ul style={{ display: "flex", flexDirection: "column", gap: "1rem", listStyle: "none" }}>
             {[
-              { icon: ShieldCheck, text: "Certyfikowane materiały budowlane" },
-              { icon: Clock,       text: "Realizacja na czas — gwarancja w umowie" },
-              { icon: Briefcase,   text: "Nowoczesne technologie i projekty" },
-              { icon: Star,        text: "Najnowszy design i wykończenia premium" },
+              { icon: ShieldCheck, text: bestFeatures[0] ?? "" },
+              { icon: Clock,       text: bestFeatures[1] ?? "" },
+              { icon: Briefcase,   text: bestFeatures[2] ?? "" },
+              { icon: Star,        text: bestFeatures[3] ?? "" },
             ].map(({ icon: Icon, text }) => (
               <li key={text} style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
                 <span style={{
@@ -474,12 +547,12 @@ export default async function HomePage() {
         style={{ paddingBlock: "var(--section-py)" }}
       >
         <div className="wp-section mx-auto max-w-content" style={{ textAlign: "center" }}>
-          <span className="section-label">Co oferujemy</span>
+          <span className="section-label">{uslugiLabel}</span>
           <h2 id="uslugi-heading" style={{ marginTop: "0.5rem" }}>
-            Pełna lista <span style={{ color: "var(--gold)" }}>usług budowlanych</span>
+            {uslugiHeading}
           </h2>
           <p style={{ marginTop: "0.875rem", color: "var(--slate)", maxWidth: "36rem", margin: "0.875rem auto 0" }}>
-            Budowa tarasów i werand, remonty, malowanie, układanie płytek, wykończanie wnętrz i wiele więcej — na terenie Rzeszowa i Podkarpacia.
+            {uslugiText}
           </p>
           <div style={{ marginTop: "2rem", display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "0.5rem" }}>
             {uslugi.slice(0, 14).map((nazwa: string) => (
@@ -490,11 +563,64 @@ export default async function HomePage() {
           </div>
           <div style={{ marginTop: "2rem" }}>
             <Link href="/uslugi" className="wp-btn-primary">
-              Zobacz pełną listę usług <ArrowRight size={15} aria-hidden />
+              {uslugiCTA} <ArrowRight size={15} aria-hidden />
             </Link>
           </div>
         </div>
       </section>
+
+      {/* ═══════════════════════════════════════
+          DLACZEGO WILK DEVELOPMENT – light bg
+      ═══════════════════════════════════════ */}
+      {whyUsItems.length > 0 && (
+        <section
+          className="section-light"
+          aria-labelledby="why-us-heading"
+          style={{ paddingBlock: "var(--section-py)" }}
+        >
+          <div className="wp-section mx-auto max-w-content">
+            <div style={{ textAlign: "center", marginBottom: "3rem" }}>
+              <span className="section-label-dash">{whyUsLabel}</span>
+              <h2 id="why-us-heading" style={{ marginTop: "0.5rem" }}>
+                {whyUsHeading}
+              </h2>
+            </div>
+            <ul
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 16rem), 1fr))",
+                gap: "1.5rem",
+                listStyle: "none",
+              }}
+            >
+              {whyUsItems.map((item) => (
+                <li
+                  key={item.id}
+                  style={{
+                    background: "var(--white)",
+                    border: "1px solid var(--border)",
+                    padding: "1.5rem",
+                    boxShadow: "var(--shadow-sm)",
+                  }}
+                >
+                  <p style={{
+                    fontFamily: "var(--font-heading, 'Montserrat', sans-serif)",
+                    fontWeight: 700,
+                    fontSize: "0.9375rem",
+                    color: "var(--charcoal)",
+                    marginBottom: "0.4rem",
+                  }}>
+                    {item.title}
+                  </p>
+                  <p style={{ fontSize: "0.8125rem", color: "var(--slate)", lineHeight: 1.65 }}>
+                    {item.description}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      )}
 
       {/* ═══════════════════════════════════════
           FAQ – white bg
@@ -506,10 +632,10 @@ export default async function HomePage() {
       >
         <div className="wp-section mx-auto" style={{ maxWidth: "54rem" }}>
           <div style={{ textAlign: "center", marginBottom: "2.5rem" }}>
-            <span className="section-label">FAQ</span>
-            <h2 style={{ marginTop: "0.5rem" }}>Masz <span style={{ color: "var(--gold)" }}>pytania?</span></h2>
+            <span className="section-label">{faqLabel}</span>
+            <h2 style={{ marginTop: "0.5rem" }}>{faqHeading}</h2>
           </div>
-          <GeoFaq items={FAQ_ITEMS} />
+          <GeoFaq items={faqItems} />
         </div>
       </section>
 
@@ -523,12 +649,12 @@ export default async function HomePage() {
       >
         <div className="wp-section mx-auto max-w-content">
           <div style={{ textAlign: "center", maxWidth: "40rem", margin: "0 auto" }}>
-            <span className="section-label">Realizacje</span>
+            <span className="section-label">{projectsLabel}</span>
             <h2 id="projects-heading" style={{ marginTop: "0.5rem" }}>
-              Galeria naszych <span style={{ color: "var(--gold)" }}>inwestycji</span>
+              {projectsHeading}
             </h2>
             <p style={{ marginTop: "0.875rem", color: "var(--slate)" }}>
-              Domy szeregowe oraz remonty pod klucz — wybrane projekty Wilk Development.
+              {projectsText}
             </p>
           </div>
 
@@ -549,7 +675,7 @@ export default async function HomePage() {
           {/* Header */}
           <div style={{ textAlign: "center", marginBottom: "3rem" }}>
             <span className="section-label-dash" style={{ justifyContent: "center", color: "var(--gold)" }}>
-              Skontaktuj się z nami
+              {contactLabel}
             </span>
             <h2
               id="contact-heading"
@@ -559,10 +685,10 @@ export default async function HomePage() {
                 fontSize: "clamp(1.6rem, 3.5vw, 2.5rem)",
               }}
             >
-              Bezpłatna wycena w 24&nbsp;h
+              {contactHeading}
             </h2>
             <p style={{ marginTop: "1rem", color: "rgba(255,255,255,0.6)", maxWidth: "38rem", margin: "1rem auto 0", lineHeight: 1.7 }}>
-              Zadzwoń, napisz lub wypełnij formularz. Odpowiadamy każdego dnia roboczego — bez zbędnego czekania.
+              {contactText}
             </p>
           </div>
 
@@ -576,7 +702,7 @@ export default async function HomePage() {
           >
             {/* Telefon */}
             <a
-              href={`tel:${CONTACT_SNIPPET.phone.replace(/\s/g, "")}`}
+              href={`tel:${contactPhone.replace(/\s/g, "")}`}
               style={{
                 display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center",
                 padding: "2.5rem 2rem",
@@ -597,24 +723,24 @@ export default async function HomePage() {
               </span>
               <div>
                 <p style={{ fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(255,255,255,0.45)", marginBottom: "0.4rem" }}>
-                  Zadzwoń teraz
+                  {contactPhoneLabel}
                 </p>
                 <p style={{
                   fontFamily: "var(--font-heading, 'Montserrat', sans-serif)",
                   fontWeight: 800, fontSize: "clamp(1.1rem, 2vw, 1.35rem)",
                   color: "var(--white)", letterSpacing: "-0.01em",
                 }}>
-                  {CONTACT_SNIPPET.phone}
+                  {contactPhone}
                 </p>
                 <p style={{ fontSize: "0.8125rem", color: "rgba(255,255,255,0.45)", marginTop: "0.3rem" }}>
-                  Pon–Pt 8:00–18:00
+                  {contactHoursWd}
                 </p>
               </div>
             </a>
 
             {/* E-mail */}
             <a
-              href={`mailto:${CONTACT_SNIPPET.email}`}
+              href={`mailto:${contactEmail}`}
               style={{
                 display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center",
                 padding: "2.5rem 2rem",
@@ -635,7 +761,7 @@ export default async function HomePage() {
               </span>
               <div>
                 <p style={{ fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(10,18,30,0.6)", marginBottom: "0.4rem" }}>
-                  Napisz do nas
+                  {contactEmailLabel}
                 </p>
                 <p style={{
                   fontFamily: "var(--font-heading, 'Montserrat', sans-serif)",
@@ -643,10 +769,10 @@ export default async function HomePage() {
                   color: "var(--navy)", letterSpacing: "-0.01em",
                   wordBreak: "break-all",
                 }}>
-                  {CONTACT_SNIPPET.email}
+                  {contactEmail}
                 </p>
                 <p style={{ fontSize: "0.8125rem", color: "rgba(10,18,30,0.55)", marginTop: "0.3rem" }}>
-                  Odpowiadamy w ciągu 24h
+                  {contactReplyTime}
                 </p>
               </div>
             </a>
@@ -671,17 +797,17 @@ export default async function HomePage() {
               </span>
               <div>
                 <p style={{ fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(255,255,255,0.45)", marginBottom: "0.4rem" }}>
-                  Obszar działania
+                  {contactAreaLabel}
                 </p>
                 <p style={{
                   fontFamily: "var(--font-heading, 'Montserrat', sans-serif)",
                   fontWeight: 800, fontSize: "clamp(1.1rem, 2vw, 1.35rem)",
                   color: "var(--white)",
                 }}>
-                  Rzeszów
+                  {contactAreaValue}
                 </p>
                 <p style={{ fontSize: "0.8125rem", color: "rgba(255,255,255,0.45)", marginTop: "0.3rem" }}>
-                  i całe Podkarpacie
+                  {contactAreaSub}
                 </p>
               </div>
             </div>
@@ -690,7 +816,7 @@ export default async function HomePage() {
           {/* CTA button */}
           <div style={{ textAlign: "center", marginTop: "3rem" }}>
             <Link href="/kontakt" className="wp-btn-primary" style={{ fontSize: "1rem", padding: "0.9rem 2.5rem" }}>
-              Wypełnij formularz kontaktowy <ArrowRight size={16} aria-hidden />
+              {contactFormCTA} <ArrowRight size={16} aria-hidden />
             </Link>
           </div>
 

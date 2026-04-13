@@ -5,7 +5,7 @@ import { ArrowRight } from "lucide-react";
 import { canonical } from "~/lib/seo";
 import type { NewsItem } from "~/data/content";
 import { Breadcrumbs } from "~/components/Breadcrumbs";
-import { getCachedNews } from "~/lib/data-cache";
+import { getCachedNews, getCachedSiteConfig } from "~/lib/data-cache";
 
 export const revalidate = 600; // aktualności – regeneruj co 10 min
 
@@ -31,21 +31,24 @@ function formatDate(iso: string) {
 }
 
 export default async function AktualnosciPage() {
-  const news = await getCachedNews();
+  const [news, cfg] = await Promise.all([getCachedNews(), getCachedSiteConfig()]);
+  const heading    = cfg.aktualnosci_heading   ?? "Aktualności";
+  const intro      = cfg.aktualnosci_intro     ?? "";
+  const readMore   = cfg.aktualnosci_read_more ?? "Czytaj więcej";
+  const navHome    = cfg.nav_home              ?? "Strona główna";
+  const navAkt     = cfg.nav_aktualnosci       ?? "Aktualności";
 
   return (
     <div className="wp-section mx-auto max-w-4xl px-4 py-12">
       <Breadcrumbs
         items={[
-          { label: "Strona główna", href: "/" },
-          { label: "Aktualności", href: "/aktualnosci" },
+          { label: navHome, href: "/" },
+          { label: navAkt,  href: "/aktualnosci" },
         ]}
       />
       <header>
-        <h1 className="text-3xl font-bold text-charcoal">Aktualności</h1>
-        <p className="mt-2 text-charcoal/80">
-          Postępy na budowach, realizacje i informacje z Wilk Development.
-        </p>
+        <h1 className="text-3xl font-bold text-charcoal">{heading}</h1>
+        <p className="mt-2 text-charcoal/80">{intro}</p>
       </header>
 
       <ul className="mt-10 space-y-10" role="list">
@@ -88,7 +91,7 @@ export default async function AktualnosciPage() {
                       textDecoration: "none",
                     }}
                   >
-                    Czytaj więcej <ArrowRight size={14} aria-hidden />
+                    {readMore} <ArrowRight size={14} aria-hidden />
                   </Link>
                 </div>
               </div>
